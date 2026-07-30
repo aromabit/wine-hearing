@@ -1,8 +1,8 @@
-import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getWine, listEvaluations, listWines } from "@/lib/db"
+import { getWine, listWines } from "@/lib/db"
 import { Card, Tag } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
+import { WineEvaluationsClient } from "@/components/wine-evaluations-client"
 
 export async function generateStaticParams() {
   const wines = await listWines()
@@ -17,10 +17,6 @@ const WineDetailPage = async ({
   const { id } = await params
   const wine = await getWine(id)
   if (!wine) notFound()
-
-  const evaluations = (await listEvaluations()).filter(
-    (evaluation) => evaluation.wineId === id,
-  )
 
   return (
     <div style={{ display: "grid", gap: "1.5rem" }}>
@@ -53,37 +49,7 @@ const WineDetailPage = async ({
         </div>
       </Card>
 
-      <div>
-        <h3 style={{ marginBottom: ".75rem" }}>
-          このワインの評価（{evaluations.length}件）
-        </h3>
-        {evaluations.length === 0 ? (
-          <p style={{ color: "var(--color-text-muted)" }}>
-            まだ評価がありません。
-          </p>
-        ) : (
-          <div style={{ display: "grid", gap: ".6rem" }}>
-            {evaluations.map((evaluation) => (
-              <Link key={evaluation.id} href={`/evaluations/${evaluation.id}`}>
-                <Card
-                  style={{
-                    padding: "1rem 1.25rem",
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span style={{ fontWeight: 700 }}>
-                    {evaluation.evaluatorId}
-                  </span>
-                  <span style={{ color: "var(--color-text-muted)" }}>
-                    {new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}
-                  </span>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+      <WineEvaluationsClient wineId={wine.id} />
     </div>
   )
 }

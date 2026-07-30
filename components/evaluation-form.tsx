@@ -1,35 +1,75 @@
 "use client"
 
-import { useActionState } from "react"
+import { FormEvent, useState } from "react"
+import { useRouter } from "next/navigation"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { RatingSlider } from "@/components/rating-slider"
 import { Wine, WineEvaluation } from "@/lib/types"
 import { fieldStyle, inputStyle, labelStyle } from "@/components/elements/form"
 import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
-
-type Action = (
-  prevState: { error?: string } | undefined,
-  formData: FormData,
-) => Promise<{ error?: string }>
+import { validateEvaluationInput } from "@/lib/validate-evaluation"
+import { saveLocalEvaluation } from "@/lib/local-evaluations"
 
 export const EvaluationForm = ({
-  action,
   wine,
   initialEvaluation,
 }: {
-  action: Action
   wine: Wine
   initialEvaluation?: WineEvaluation
 }) => {
-  const [state, formAction, pending] = useActionState(action, undefined)
+  const router = useRouter()
+  const [error, setError] = useState<string>()
+  const [pending, setPending] = useState(false)
   const tasteCriteria = RATING_CRITERIA.filter((c) => c.group === "taste")
   const aromaCriteria = RATING_CRITERIA.filter((c) => c.group === "aroma")
 
-  return (
-    <form action={formAction} style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}>
-      <input type="hidden" name="wineId" value={wine.id} />
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setError(undefined)
+    setPending(true)
 
+    const formData = new FormData(e.currentTarget)
+    const body: Record<string, unknown> = { wineId: wine.id }
+    for (const criterion of RATING_CRITERIA) {
+      body[criterion.id] = formData.get(criterion.id)
+    }
+    body.evaluatorId = formData.get("evaluatorId")
+    body.comment = formData.get("comment") || undefined
+    body.tastingTemperature = formData.get("tastingTemperature") || undefined
+    body.decanting = formData.get("decanting") === "on"
+    body.memo = formData.get("memo") || undefined
+
+    const result = validateEvaluationInput(body)
+    if ("error" in result) {
+      setError(result.error)
+      setPending(false)
+      return
+    }
+
+    const evaluation: WineEvaluation = {
+      id: initialEvaluation?.id ?? crypto.randomUUID(),
+      wineId: wine.id,
+      evaluatorId: body.evaluatorId as string,
+      evaluatedAt: initialEvaluation?.evaluatedAt ?? new Date().toISOString(),
+      ...result.vector,
+      comment: (body.comment as string) || undefined,
+      tastingTemperature: body.tastingTemperature
+        ? Number(body.tastingTemperature)
+        : undefined,
+      decanting: body.decanting as boolean,
+      memo: (body.memo as string) || undefined,
+    }
+
+    saveLocalEvaluation(evaluation)
+    router.push(`/evaluations/detail?id=${evaluation.id}`)
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
+    >
       <div>
         <h3 style={{ marginBottom: ".75rem" }}>味覚・構造</h3>
         <div style={{ display: "grid", gap: ".6rem" }}>
@@ -122,8 +162,8 @@ export const EvaluationForm = ({
         </div>
       </Card>
 
-      {state?.error && (
-        <p style={{ color: "#b3261e", fontSize: ".875rem" }}>{state.error}</p>
+      {error && (
+        <p style={{ color: "#b3261e", fontSize: ".875rem" }}>{error}</p>
       )}
 
       <Button type="submit" disabled={pending} style={{ width: "fit-content" }}>
