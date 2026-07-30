@@ -5,6 +5,7 @@ import { useLocalEvaluations } from "@/lib/use-local-evaluations"
 import { Wine } from "@/lib/types"
 import { Card } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
+import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
 
 export const EvaluationsListClient = ({ wines }: { wines: Wine[] }) => {
   const { evaluations, loaded } = useLocalEvaluations()
@@ -12,7 +13,18 @@ export const EvaluationsListClient = ({ wines }: { wines: Wine[] }) => {
 
   return (
     <div>
-      <h2 style={{ marginBottom: "1.5rem" }}>評価一覧</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+          gap: "1rem",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>評価一覧</h2>
+        <ExportEvaluationsButton />
+      </div>
       {!loaded ? null : evaluations.length === 0 ? (
         <p style={{ color: "var(--color-text-muted)" }}>
           評価データはまだありません。ワイン詳細ページから評価を追加できます。
