@@ -4,7 +4,8 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import { useLocalEvaluations } from "@/lib/use-local-evaluations"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
-import { computePca2D, PcaPoint } from "@/lib/pca"
+import { computePca2D, PcaPoint, standardize } from "@/lib/pca"
+import { kMeans } from "@/lib/kmeans"
 import { Wine } from "@/lib/types"
 import { Card } from "@/components/elements/card"
 import { Button } from "@/components/elements/button"
@@ -13,14 +14,20 @@ const WIDTH = 640
 const HEIGHT = 480
 const PADDING = 32
 
+// dataviz skillの検証済みカテゴリカルパレット（散布図の全ペア比較で色覚安全なのは先頭3色まで）
+const CLUSTER_COLORS = ["#2a78d6", "#eb6834", "#1baf7a"]
+const CLUSTER_LABELS = ["クラスタ 1", "クラスタ 2", "クラスタ 3"]
+const CLUSTER_OPTIONS = [2, 3]
+
 export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
   const { evaluations, loaded } = useLocalEvaluations()
   const [view, setView] = useState<"scatter" | "table">("scatter")
+  const [clusterCount, setClusterCount] = useState(3)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const wineNameById = new Map(wines.map((wine) => [wine.id, wine.name]))
 
-  const points = useMemo(() => {
-    if (evaluations.length < 2) return []
+  const { points, clusters } = useMemo(() => {
+    if (evaluations.length < 2) return { points: [], clusters: [] as number[] }
     const matrix = evaluations.map((evaluation) =>
       RATING_CRITERIA.map((criterion) => evaluation[criterion.id]),
     )
@@ -28,10 +35,14 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
     try {
       raw = computePca2D(matrix)
     } catch {
-      return []
+      return { points: [], clusters: [] as number[] }
     }
-    return raw.map((point, i) => ({ ...point, evaluation: evaluations[i] }))
-  }, [evaluations])
+    const clusterAssignments = kMeans(standardize(matrix), clusterCount)
+    return {
+      points: raw.map((point, i) => ({ ...point, evaluation: evaluations[i] })),
+      clusters: clusterAssignments,
+    }
+  }, [evaluations, clusterCount])
 
   if (!loaded) return null
 
@@ -62,6 +73,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
     HEIGHT - PADDING - ((y - yMin) / yRange) * (HEIGHT - PADDING * 2)
 
   const hovered = points.find((p) => p.evaluation.id === hoveredId)
+  const effectiveClusterCount = Math.min(clusterCount, evaluations.length)
 
   return (
     <div>
@@ -71,12 +83,14 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: "1rem",
+          flexWrap: "wrap",
+          gap: "1rem",
         }}
       >
         <div>
           <h2 style={{ margin: 0 }}>評価マップ（PCA）</h2>
           <p style={{ color: "var(--color-text-muted)", fontSize: ".85rem", marginTop: ".3rem" }}>
-            23次元の評価ベクトルを主成分分析で2次元に圧縮し、味わいの近さを俯瞰します。
+            23次元の評価ベクトルを主成分分析で2次元に圧縮し、k-meansでクラスタ分けして味わいの近さを俯瞰します。
           </p>
         </div>
         <div style={{ display: "flex", gap: ".5rem" }}>
@@ -94,6 +108,51 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
           >
             テーブル
           </Button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: ".75rem",
+          marginBottom: "1rem",
+        }}
+      >
+        <span style={{ fontSize: ".85rem", color: "var(--color-text-muted)" }}>
+          クラスタ数
+        </span>
+        {CLUSTER_OPTIONS.map((count) => (
+          <Button
+            key={count}
+            type="button"
+            variant={clusterCount === count ? "primary" : "outline"}
+            onClick={() => setClusterCount(count)}
+            style={{ padding: ".3rem .8rem" }}
+          >
+            {count}
+          </Button>
+        ))}
+        <div style={{ display: "flex", gap: "1rem", marginLeft: "1rem" }}>
+          {Array.from({ length: effectiveClusterCount }, (_, i) => (
+            <div
+              key={i}
+              style={{ display: "flex", alignItems: "center", gap: ".35rem" }}
+            >
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: CLUSTER_COLORS[i],
+                  display: "inline-block",
+                }}
+              />
+              <span style={{ fontSize: ".8rem", color: "var(--color-text-muted)" }}>
+                {CLUSTER_LABELS[i]}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -137,7 +196,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
               PC2
             </text>
 
-            {points.map((point) => {
+            {points.map((point, i) => {
               const isHovered = point.evaluation.id === hoveredId
               return (
                 <circle
@@ -145,7 +204,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                   cx={toSvgX(point.x)}
                   cy={toSvgY(point.y)}
                   r={isHovered ? 8 : 6}
-                  fill="var(--color-primary)"
+                  fill={CLUSTER_COLORS[clusters[i]] ?? CLUSTER_COLORS[0]}
                   stroke="var(--color-surface)"
                   strokeWidth={2}
                   style={{ cursor: "pointer" }}
@@ -189,12 +248,13 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
               <tr style={{ borderBottom: "1px solid var(--color-border)", textAlign: "left" }}>
                 <th style={{ padding: ".5rem" }}>ワイン</th>
                 <th style={{ padding: ".5rem" }}>評価者</th>
+                <th style={{ padding: ".5rem" }}>クラスタ</th>
                 <th style={{ padding: ".5rem", textAlign: "right" }}>PC1</th>
                 <th style={{ padding: ".5rem", textAlign: "right" }}>PC2</th>
               </tr>
             </thead>
             <tbody>
-              {points.map((point) => (
+              {points.map((point, i) => (
                 <tr
                   key={point.evaluation.id}
                   style={{ borderBottom: "1px solid var(--color-border)" }}
@@ -205,6 +265,27 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                     </Link>
                   </td>
                   <td style={{ padding: ".5rem" }}>{point.evaluation.evaluatorId}</td>
+                  <td style={{ padding: ".5rem" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: ".4rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          background:
+                            CLUSTER_COLORS[clusters[i]] ?? CLUSTER_COLORS[0],
+                          display: "inline-block",
+                        }}
+                      />
+                      {CLUSTER_LABELS[clusters[i]] ?? CLUSTER_LABELS[0]}
+                    </span>
+                  </td>
                   <td style={{ padding: ".5rem", textAlign: "right" }}>
                     {point.x.toFixed(2)}
                   </td>

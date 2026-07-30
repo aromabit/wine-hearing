@@ -12,7 +12,7 @@ function standardDeviation(values: number[], avg: number): number {
   return Math.sqrt(variance)
 }
 
-function standardize(matrix: number[][]): number[][] {
+export function standardize(matrix: number[][]): number[][] {
   const dimensions = matrix[0].length
   const means: number[] = []
   const stds: number[] = []
