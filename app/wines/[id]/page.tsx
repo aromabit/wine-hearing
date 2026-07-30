@@ -1,10 +1,13 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getWine, listEvaluations } from "@/lib/db"
-import { DeleteWineButton } from "@/components/delete-wine-button"
+import { getWine, listEvaluations, listWines } from "@/lib/db"
 import { Card, Tag } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
-import { LinkButton } from "@/components/elements/button"
+
+export async function generateStaticParams() {
+  const wines = await listWines()
+  return wines.map((wine) => ({ id: wine.id }))
+}
 
 const WineDetailPage = async ({
   params,
@@ -25,22 +28,7 @@ const WineDetailPage = async ({
         <div style={{ display: "flex", gap: "1.25rem" }}>
           <BottleThumb size={80} />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: "1rem",
-              }}
-            >
-              <h2 style={{ margin: 0 }}>{wine.name}</h2>
-              <div style={{ display: "flex", gap: ".5rem", flexShrink: 0 }}>
-                <LinkButton href={`/wines/${wine.id}/edit`} variant="outline">
-                  編集
-                </LinkButton>
-                <DeleteWineButton wineId={wine.id} />
-              </div>
-            </div>
+            <h2 style={{ margin: 0 }}>{wine.name}</h2>
             <p
               style={{
                 color: "var(--color-text-muted)",
@@ -66,19 +54,9 @@ const WineDetailPage = async ({
       </Card>
 
       <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: ".75rem",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>このワインの評価（{evaluations.length}件）</h3>
-          <LinkButton href={`/evaluations/new?wineId=${wine.id}`}>
-            + 評価を追加
-          </LinkButton>
-        </div>
+        <h3 style={{ marginBottom: ".75rem" }}>
+          このワインの評価（{evaluations.length}件）
+        </h3>
         {evaluations.length === 0 ? (
           <p style={{ color: "var(--color-text-muted)" }}>
             まだ評価がありません。

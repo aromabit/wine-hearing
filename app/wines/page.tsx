@@ -2,24 +2,13 @@ import Link from "next/link"
 import { listWines } from "@/lib/db"
 import { Card, Tag } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
-import { LinkButton } from "@/components/elements/button"
 
 const WinesPage = async () => {
   const wines = await listWines()
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <h2 style={{ margin: 0 }}>ワイン一覧</h2>
-        <LinkButton href="/wines/new">+ ワイン登録</LinkButton>
-      </div>
+      <h2 style={{ marginBottom: "1.5rem" }}>ワイン一覧</h2>
 
       {wines.length === 0 ? (
         <p style={{ color: "var(--color-text-muted)" }}>

@@ -1,10 +1,13 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getEvaluation, getWine } from "@/lib/db"
+import { getEvaluation, getWine, listEvaluations } from "@/lib/db"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
-import { DeleteEvaluationButton } from "@/components/delete-evaluation-button"
 import { Card } from "@/components/elements/card"
-import { LinkButton } from "@/components/elements/button"
+
+export async function generateStaticParams() {
+  const evaluations = await listEvaluations()
+  return evaluations.map((evaluation) => ({ id: evaluation.id }))
+}
 
 const EvaluationDetailPage = async ({
   params,
@@ -20,25 +23,10 @@ const EvaluationDetailPage = async ({
   return (
     <div style={{ display: "grid", gap: "1.5rem" }}>
       <Card style={{ padding: "1.5rem" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            gap: "1rem",
-          }}
-        >
-          <h2 style={{ margin: 0 }}>
-            {wine ? <Link href={`/wines/${wine.id}`}>{wine.name}</Link> : "(削除済みワイン)"}
-            {" の評価"}
-          </h2>
-          <div style={{ display: "flex", gap: ".5rem", flexShrink: 0 }}>
-            <LinkButton href={`/evaluations/${evaluation.id}/edit`} variant="outline">
-              編集
-            </LinkButton>
-            <DeleteEvaluationButton evaluationId={evaluation.id} />
-          </div>
-        </div>
+        <h2 style={{ margin: 0 }}>
+          {wine ? <Link href={`/wines/${wine.id}`}>{wine.name}</Link> : "(削除済みワイン)"}
+          {" の評価"}
+        </h2>
 
         <dl
           style={{
