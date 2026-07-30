@@ -45,6 +45,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <Link href="/evaluations" style={{ color: "var(--color-text)" }}>
               評価
             </Link>
+            <Link href="/analysis" style={{ color: "var(--color-text)" }}>
+              評価マップ
+            </Link>
           </nav>
         </header>
         <main
