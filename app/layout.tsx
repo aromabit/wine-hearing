@@ -63,7 +63,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             padding: "1rem 1.5rem",
           }}
         >
-          <p>&copy; My organization</p>
+          <p>&copy; ScentifAI</p>
         </footer>
       </body>
     </html>
