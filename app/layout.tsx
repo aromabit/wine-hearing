@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Title } from "@/components/elements/layout"
+import { SeedLocalEvaluations } from "@/components/seed-local-evaluations"
 import "./reset.css"
 
 export const metadata = {
@@ -11,6 +12,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ja">
       <body>
+        <SeedLocalEvaluations />
         <header
           style={{
             backgroundColor: "var(--color-surface)",
