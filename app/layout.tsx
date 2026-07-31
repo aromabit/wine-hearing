@@ -18,14 +18,15 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             backgroundColor: "var(--color-surface)",
             borderBottom: "2px solid var(--color-gold)",
             boxShadow: "0 1px 3px rgba(43, 37, 35, 0.06)",
-            padding: "0 1.5rem",
+            padding: ".75rem 1.5rem",
             position: "sticky",
             top: 0,
             zIndex: 10,
             display: "flex",
             alignItems: "center",
-            gap: "2rem",
-            height: "3.5rem",
+            flexWrap: "wrap",
+            gap: "1rem 2rem",
+            minHeight: "3.5rem",
           }}
         >
           <Title>
@@ -35,7 +36,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           <nav
             style={{
               display: "flex",
-              gap: "1.5rem",
+              flexWrap: "wrap",
+              gap: ".5rem 1.5rem",
               fontWeight: 600,
               fontSize: ".9rem",
             }}
