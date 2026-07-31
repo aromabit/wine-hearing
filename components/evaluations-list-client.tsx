@@ -2,14 +2,13 @@
 
 import Link from "next/link"
 import { useLocalEvaluations } from "@/lib/use-local-evaluations"
-import { Wine } from "@/lib/types"
 import { Card } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
+import { LinkButton } from "@/components/elements/button"
 import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
 
-export const EvaluationsListClient = ({ wines }: { wines: Wine[] }) => {
+export const EvaluationsListClient = () => {
   const { evaluations, loaded } = useLocalEvaluations()
-  const wineNameById = new Map(wines.map((wine) => [wine.id, wine.name]))
 
   return (
     <div>
@@ -23,11 +22,14 @@ export const EvaluationsListClient = ({ wines }: { wines: Wine[] }) => {
         }}
       >
         <h2 style={{ margin: 0 }}>評価一覧</h2>
-        <ExportEvaluationsButton />
+        <div style={{ display: "flex", gap: ".5rem" }}>
+          <ExportEvaluationsButton />
+          <LinkButton href="/evaluations/new">+ 評価を追加</LinkButton>
+        </div>
       </div>
       {!loaded ? null : evaluations.length === 0 ? (
         <p style={{ color: "var(--color-text-muted)" }}>
-          評価データはまだありません。ワイン詳細ページから評価を追加できます。
+          評価データはまだありません。「+ 評価を追加」から評価を登録できます。
         </p>
       ) : (
         <div style={{ display: "grid", gap: ".6rem" }}>
@@ -50,7 +52,7 @@ export const EvaluationsListClient = ({ wines }: { wines: Wine[] }) => {
                   <BottleThumb size={40} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
-                      {wineNameById.get(evaluation.wineId) || "(削除済みワイン)"}
+                      {evaluation.wineName || "(ワイン名未登録)"}
                     </div>
                     <div
                       style={{

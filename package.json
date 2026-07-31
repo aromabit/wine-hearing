@@ -10,8 +10,7 @@
     "build": "next build",
     "start": "next start",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
-    "db:seed": "node scripts/seed-wines.mjs"
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

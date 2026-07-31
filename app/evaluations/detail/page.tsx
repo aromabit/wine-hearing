@@ -1,12 +1,10 @@
 import { Suspense } from "react"
-import { listWines } from "@/lib/db"
 import { EvaluationDetailClient } from "@/components/evaluation-detail-client"
 
-const EvaluationDetailPage = async () => {
-  const wines = await listWines()
+const EvaluationDetailPage = () => {
   return (
     <Suspense fallback={null}>
-      <EvaluationDetailClient wines={wines} />
+      <EvaluationDetailClient />
     </Suspense>
   )
 }

@@ -1,9 +1,7 @@
-import { listWines } from "@/lib/db"
 import { EvaluationsListClient } from "@/components/evaluations-list-client"
 
-const EvaluationsPage = async () => {
-  const wines = await listWines()
-  return <EvaluationsListClient wines={wines} />
+const EvaluationsPage = () => {
+  return <EvaluationsListClient />
 }
 
 export default EvaluationsPage

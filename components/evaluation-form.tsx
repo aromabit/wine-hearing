@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { RatingSlider } from "@/components/rating-slider"
-import { Wine, WineEvaluation } from "@/lib/types"
+import { WineEvaluation } from "@/lib/types"
 import { fieldStyle, inputStyle, labelStyle } from "@/components/elements/form"
 import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
@@ -13,10 +13,8 @@ import { validateEvaluationInput } from "@/lib/validate-evaluation"
 import { saveLocalEvaluation } from "@/lib/local-evaluations"
 
 export const EvaluationForm = ({
-  wine,
   initialEvaluation,
 }: {
-  wine: Wine
   initialEvaluation?: WineEvaluation
 }) => {
   const router = useRouter()
@@ -31,10 +29,11 @@ export const EvaluationForm = ({
     setPending(true)
 
     const formData = new FormData(e.currentTarget)
-    const body: Record<string, unknown> = { wineId: wine.id }
+    const body: Record<string, unknown> = {}
     for (const criterion of RATING_CRITERIA) {
       body[criterion.id] = formData.get(criterion.id)
     }
+    body.wineName = formData.get("wineName")
     body.evaluatorId = formData.get("evaluatorId")
     body.comment = formData.get("comment") || undefined
     body.tastingTemperature = formData.get("tastingTemperature") || undefined
@@ -48,9 +47,29 @@ export const EvaluationForm = ({
       return
     }
 
+    const grapeVarietiesRaw = formData.get("grapeVarieties")
+    const grapeVarieties =
+      typeof grapeVarietiesRaw === "string" && grapeVarietiesRaw.trim() !== ""
+        ? grapeVarietiesRaw
+            .split(",")
+            .map((v) => v.trim())
+            .filter(Boolean)
+        : undefined
+    const vintageRaw = formData.get("vintage")
+    const wineAlcoholPercentRaw = formData.get("wineAlcoholPercent")
+
     const evaluation: WineEvaluation = {
       id: initialEvaluation?.id ?? crypto.randomUUID(),
-      wineId: wine.id,
+      wineName: body.wineName as string,
+      producer: (formData.get("producer") as string) || undefined,
+      grapeVarieties,
+      country: (formData.get("country") as string) || undefined,
+      region: (formData.get("region") as string) || undefined,
+      vintage: vintageRaw ? Number(vintageRaw) : undefined,
+      wineAlcoholPercent: wineAlcoholPercentRaw
+        ? Number(wineAlcoholPercentRaw)
+        : undefined,
+      wineMemo: (formData.get("wineMemo") as string) || undefined,
       evaluatorId: body.evaluatorId as string,
       evaluatedAt: initialEvaluation?.evaluatedAt ?? new Date().toISOString(),
       ...result.vector,
@@ -71,6 +90,109 @@ export const EvaluationForm = ({
       onSubmit={handleSubmit}
       style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
     >
+      <Card style={{ padding: "1.25rem" }}>
+        <h3 style={{ marginBottom: ".9rem" }}>ワイン情報</h3>
+        <div style={{ display: "grid", gap: ".9rem" }}>
+          <div style={fieldStyle}>
+            <label htmlFor="wineName" style={labelStyle}>
+              ワイン名 *
+            </label>
+            <input
+              id="wineName"
+              name="wineName"
+              required
+              defaultValue={initialEvaluation?.wineName}
+              style={inputStyle}
+            />
+          </div>
+          <div style={fieldStyle}>
+            <label htmlFor="producer" style={labelStyle}>
+              生産者
+            </label>
+            <input
+              id="producer"
+              name="producer"
+              defaultValue={initialEvaluation?.producer}
+              style={inputStyle}
+            />
+          </div>
+          <div style={fieldStyle}>
+            <label htmlFor="grapeVarieties" style={labelStyle}>
+              ブドウ品種（カンマ区切り）
+            </label>
+            <input
+              id="grapeVarieties"
+              name="grapeVarieties"
+              defaultValue={initialEvaluation?.grapeVarieties?.join(", ")}
+              placeholder="カベルネ・ソーヴィニョン, メルロ"
+              style={inputStyle}
+            />
+          </div>
+          <div style={{ display: "flex", gap: ".9rem" }}>
+            <div style={{ ...fieldStyle, flex: 1 }}>
+              <label htmlFor="country" style={labelStyle}>
+                生産国
+              </label>
+              <input
+                id="country"
+                name="country"
+                defaultValue={initialEvaluation?.country}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ ...fieldStyle, flex: 1 }}>
+              <label htmlFor="region" style={labelStyle}>
+                産地
+              </label>
+              <input
+                id="region"
+                name="region"
+                defaultValue={initialEvaluation?.region}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: ".9rem" }}>
+            <div style={{ ...fieldStyle, flex: 1 }}>
+              <label htmlFor="vintage" style={labelStyle}>
+                ヴィンテージ
+              </label>
+              <input
+                id="vintage"
+                name="vintage"
+                type="number"
+                defaultValue={initialEvaluation?.vintage}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ ...fieldStyle, flex: 1 }}>
+              <label htmlFor="wineAlcoholPercent" style={labelStyle}>
+                アルコール度数（%）
+              </label>
+              <input
+                id="wineAlcoholPercent"
+                name="wineAlcoholPercent"
+                type="number"
+                step="0.1"
+                defaultValue={initialEvaluation?.wineAlcoholPercent}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div style={fieldStyle}>
+            <label htmlFor="wineMemo" style={labelStyle}>
+              ワインメモ
+            </label>
+            <SpeechTextarea
+              id="wineMemo"
+              name="wineMemo"
+              defaultValue={initialEvaluation?.wineMemo}
+              style={{ minHeight: "3rem" }}
+            />
+          </div>
+        </div>
+      </Card>
+
       <div>
         <h3 style={{ marginBottom: ".75rem" }}>味覚・構造</h3>
         <div style={{ display: "grid", gap: ".6rem" }}>

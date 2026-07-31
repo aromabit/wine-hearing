@@ -2,14 +2,13 @@
 
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Wine } from "@/lib/types"
 import { deleteLocalEvaluation } from "@/lib/local-evaluations"
 import { useLocalEvaluation } from "@/lib/use-local-evaluations"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
-import { Card } from "@/components/elements/card"
+import { Card, Tag } from "@/components/elements/card"
 import { Button, LinkButton } from "@/components/elements/button"
 
-export const EvaluationDetailClient = ({ wines }: { wines: Wine[] }) => {
+export const EvaluationDetailClient = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const id = searchParams.get("id")
@@ -28,8 +27,6 @@ export const EvaluationDetailClient = ({ wines }: { wines: Wine[] }) => {
     )
   }
 
-  const wine = wines.find((w) => w.id === evaluation.wineId)
-
   const handleDelete = () => {
     if (!confirm("この評価を削除しますか？")) return
     deleteLocalEvaluation(evaluation.id)
@@ -47,13 +44,10 @@ export const EvaluationDetailClient = ({ wines }: { wines: Wine[] }) => {
             gap: "1rem",
           }}
         >
-          <h2 style={{ margin: 0 }}>
-            {wine ? <Link href={`/wines/${wine.id}`}>{wine.name}</Link> : "(不明なワイン)"}
-            {" の評価"}
-          </h2>
+          <h2 style={{ margin: 0 }}>{evaluation.wineName || "(ワイン名未登録)"}</h2>
           <div style={{ display: "flex", gap: ".5rem", flexShrink: 0 }}>
             <LinkButton
-              href={`/evaluations/new?wineId=${evaluation.wineId}&editId=${evaluation.id}`}
+              href={`/evaluations/new?editId=${evaluation.id}`}
               variant="outline"
             >
               編集
@@ -63,6 +57,22 @@ export const EvaluationDetailClient = ({ wines }: { wines: Wine[] }) => {
             </Button>
           </div>
         </div>
+
+        <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap", marginTop: ".75rem" }}>
+          {evaluation.vintage && <Tag>{evaluation.vintage}</Tag>}
+          {evaluation.wineAlcoholPercent != null && (
+            <Tag>{evaluation.wineAlcoholPercent}%</Tag>
+          )}
+          {evaluation.grapeVarieties?.map((v) => <Tag key={v}>{v}</Tag>)}
+        </div>
+        <p style={{ color: "var(--color-text-muted)", marginTop: ".5rem", fontSize: ".9rem" }}>
+          {[evaluation.producer, evaluation.region, evaluation.country]
+            .filter(Boolean)
+            .join(" / ") || "ワイン情報未登録"}
+        </p>
+        {evaluation.wineMemo && (
+          <p style={{ marginTop: ".5rem", fontSize: ".9rem" }}>{evaluation.wineMemo}</p>
+        )}
 
         <dl
           style={{

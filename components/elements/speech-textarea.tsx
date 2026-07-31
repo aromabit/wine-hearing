@@ -48,12 +48,11 @@ export const SpeechTextarea = ({
 }) => {
   const [value, setValue] = useState(defaultValue ?? "")
   const [listening, setListening] = useState(false)
-  const [supported, setSupported] = useState(false)
+  const [supported] = useState(() => !!getSpeechRecognitionConstructor())
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
   const baseValueRef = useRef("")
 
   useEffect(() => {
-    setSupported(!!getSpeechRecognitionConstructor())
     return () => {
       recognitionRef.current?.stop()
     }

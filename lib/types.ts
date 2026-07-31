@@ -1,20 +1,16 @@
-export type Wine = {
+export type WineEvaluation = {
   id: string
-  name: string
+  evaluatorId: string
+  evaluatedAt: string
+
+  wineName: string
   producer?: string
   grapeVarieties?: string[]
   country?: string
   region?: string
   vintage?: number
-  alcohol?: number
-  memo?: string
-}
-
-export type WineEvaluation = {
-  id: string
-  wineId: string
-  evaluatorId: string
-  evaluatedAt: string
+  wineAlcoholPercent?: number
+  wineMemo?: string
 
   sweetness: number
   acidity: number

@@ -270,30 +270,24 @@ wine_id,wine_name,evaluator_id,sweetness,acidity,tannin,body,alcohol,fruitiness,
 
 ## 12. データモデル
 
-### Wine
-
-```ts
-type Wine = {
-  id: string
-  name: string
-  producer?: string
-  grapeVarieties?: string[]
-  country?: string
-  region?: string
-  vintage?: number
-  alcohol?: number
-  memo?: string
-}
-```
+ワインは独立したオブジェクトを持たず、評価（WineEvaluation）作成時にワイン情報を直接入力する。
 
 ### WineEvaluation
 
 ```ts
 type WineEvaluation = {
   id: string
-  wineId: string
   evaluatorId: string
   evaluatedAt: string
+
+  wineName: string
+  producer?: string
+  grapeVarieties?: string[]
+  country?: string
+  region?: string
+  vintage?: number
+  wineAlcoholPercent?: number
+  wineMemo?: string
 
   sweetness: number
   acidity: number
@@ -445,17 +439,10 @@ CSV / JSONをいつでも出力できること。
 
 MVPでは以下を実装する。
 
-### 管理
-
-- ワイン登録
-- ワイン編集
-- ワイン一覧
-- ワイン詳細
-
 ### 評価
 
-- 評価対象ワイン選択
-- 23次元入力
+- 評価作成時にワイン情報を入力
+- 味覚・香り評価入力
 - コメント入力
 - 評価保存
 - 評価編集

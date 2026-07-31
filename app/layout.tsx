@@ -42,9 +42,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
               fontSize: ".9rem",
             }}
           >
-            <Link href="/wines" style={{ color: "var(--color-text)" }}>
-              ワイン
-            </Link>
             <Link href="/evaluations" style={{ color: "var(--color-text)" }}>
               評価
             </Link>

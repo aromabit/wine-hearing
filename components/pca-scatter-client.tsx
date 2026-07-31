@@ -6,7 +6,6 @@ import { useLocalEvaluations } from "@/lib/use-local-evaluations"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { computePca2D, PcaPoint, standardize } from "@/lib/pca"
 import { kMeans } from "@/lib/kmeans"
-import { Wine } from "@/lib/types"
 import { Card } from "@/components/elements/card"
 import { Button } from "@/components/elements/button"
 
@@ -19,12 +18,11 @@ const CLUSTER_COLORS = ["#2a78d6", "#eb6834", "#1baf7a"]
 const CLUSTER_LABELS = ["クラスタ 1", "クラスタ 2", "クラスタ 3"]
 const CLUSTER_OPTIONS = [2, 3]
 
-export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
+export const PcaScatterClient = () => {
   const { evaluations, loaded } = useLocalEvaluations()
   const [view, setView] = useState<"scatter" | "table">("scatter")
   const [clusterCount, setClusterCount] = useState(3)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
-  const wineNameById = new Map(wines.map((wine) => [wine.id, wine.name]))
 
   const { points, clusters } = useMemo(() => {
     if (evaluations.length < 2) return { points: [], clusters: [] as number[] }
@@ -220,7 +218,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                     fill="var(--color-text-muted)"
                     pointerEvents="none"
                   >
-                    {wineNameById.get(point.evaluation.wineId) || "(削除済みワイン)"}
+                    {point.evaluation.wineName || "(ワイン名未登録)"}
                   </text>
                 </g>
               )
@@ -244,7 +242,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                 }}
               >
                 <div style={{ fontWeight: 700 }}>
-                  {wineNameById.get(hovered.evaluation.wineId) || "(削除済みワイン)"}
+                  {hovered.evaluation.wineName || "(ワイン名未登録)"}
                 </div>
                 <div style={{ color: "var(--color-text-muted)" }}>
                   {hovered.evaluation.evaluatorId}
@@ -273,7 +271,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                 >
                   <td style={{ padding: ".5rem" }}>
                     <Link href={`/evaluations/detail?id=${point.evaluation.id}`}>
-                      {wineNameById.get(point.evaluation.wineId) || "(削除済みワイン)"}
+                      {point.evaluation.wineName || "(ワイン名未登録)"}
                     </Link>
                   </td>
                   <td style={{ padding: ".5rem" }}>{point.evaluation.evaluatorId}</td>

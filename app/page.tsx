@@ -10,7 +10,7 @@ const Page: FC = () => {
         ソムリエによる23次元の官能評価を記録・蓄積します。
       </p>
       <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-        <LinkButton href="/wines">ワイン一覧へ</LinkButton>
+        <LinkButton href="/evaluations/new">評価を追加</LinkButton>
         <LinkButton href="/evaluations" variant="outline">
           評価一覧へ
         </LinkButton>

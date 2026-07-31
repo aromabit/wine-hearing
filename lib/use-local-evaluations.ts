@@ -41,17 +41,6 @@ export function useLocalEvaluations(): {
   return { evaluations, loaded }
 }
 
-export function useLocalEvaluationsByWine(
-  wineId: string,
-): { evaluations: WineEvaluation[]; loaded: boolean } {
-  const { evaluations, loaded } = useLocalEvaluations()
-  const filtered = useMemo(
-    () => evaluations.filter((evaluation) => evaluation.wineId === wineId),
-    [evaluations, wineId],
-  )
-  return { evaluations: filtered, loaded }
-}
-
 export function useLocalEvaluation(
   id: string | null,
 ): { evaluation: WineEvaluation | undefined; loaded: boolean } {
