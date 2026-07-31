@@ -1,11 +1,10 @@
 "use client"
 
-import { useActionState, useRef } from "react"
+import { useActionState } from "react"
 import { Wine } from "@/lib/types"
 import { fieldStyle, inputStyle, labelStyle } from "@/components/elements/form"
 import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
-import { JanLookup } from "@/components/jan-lookup"
 
 type Action = (
   prevState: { error?: string } | undefined,
@@ -20,16 +19,10 @@ export const WineForm = ({
   initialWine?: Wine
 }) => {
   const [state, formAction, pending] = useActionState(action, undefined)
-  const nameInputRef = useRef<HTMLInputElement>(null)
 
   return (
     <Card style={{ padding: "1.5rem", maxWidth: 480 }}>
       <form action={formAction} style={{ display: "grid", gap: "1.1rem" }}>
-      <JanLookup
-        onSelect={(name) => {
-          if (nameInputRef.current) nameInputRef.current.value = name
-        }}
-      />
       <div style={fieldStyle}>
         <label htmlFor="name" style={labelStyle}>
           ワイン名 *
@@ -38,7 +31,6 @@ export const WineForm = ({
           id="name"
           name="name"
           required
-          ref={nameInputRef}
           defaultValue={initialWine?.name}
           style={inputStyle}
         />
