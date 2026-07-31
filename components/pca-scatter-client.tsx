@@ -198,19 +198,31 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
 
             {points.map((point, i) => {
               const isHovered = point.evaluation.id === hoveredId
+              const cx = toSvgX(point.x)
+              const cy = toSvgY(point.y)
               return (
-                <circle
-                  key={point.evaluation.id}
-                  cx={toSvgX(point.x)}
-                  cy={toSvgY(point.y)}
-                  r={isHovered ? 8 : 6}
-                  fill={CLUSTER_COLORS[clusters[i]] ?? CLUSTER_COLORS[0]}
-                  stroke="var(--color-surface)"
-                  strokeWidth={2}
-                  style={{ cursor: "pointer" }}
-                  onMouseEnter={() => setHoveredId(point.evaluation.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                />
+                <g key={point.evaluation.id}>
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={isHovered ? 8 : 6}
+                    fill={CLUSTER_COLORS[clusters[i]] ?? CLUSTER_COLORS[0]}
+                    stroke="var(--color-surface)"
+                    strokeWidth={2}
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={() => setHoveredId(point.evaluation.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                  />
+                  <text
+                    x={cx + 9}
+                    y={cy + 3}
+                    fontSize={10}
+                    fill="var(--color-text-muted)"
+                    pointerEvents="none"
+                  >
+                    {wineNameById.get(point.evaluation.wineId) || "(削除済みワイン)"}
+                  </text>
+                </g>
               )
             })}
           </svg>
