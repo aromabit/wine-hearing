@@ -25,7 +25,7 @@ const variants = {
   outline: {
     background: "transparent",
     color: "var(--color-primary)",
-    borderColor: "var(--color-primary)",
+    border: "1px solid var(--color-primary)",
   },
   ghost: {
     background: "transparent",
