@@ -8,6 +8,7 @@ import { Wine, WineEvaluation } from "@/lib/types"
 import { fieldStyle, inputStyle, labelStyle } from "@/components/elements/form"
 import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
+import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
 import { saveLocalEvaluation } from "@/lib/local-evaluations"
 
@@ -100,11 +101,11 @@ export const EvaluationForm = ({
         <label htmlFor="comment" style={labelStyle}>
           自由コメント
         </label>
-        <textarea
+        <SpeechTextarea
           id="comment"
           name="comment"
           defaultValue={initialEvaluation?.comment}
-          style={{ ...inputStyle, minHeight: "5rem" }}
+          style={{ minHeight: "5rem" }}
           placeholder="酸味が美しく、タンニンは細かい。黒果実と樽香が調和している。"
         />
       </div>
@@ -152,11 +153,11 @@ export const EvaluationForm = ({
             <label htmlFor="memo" style={labelStyle}>
               評価メモ
             </label>
-            <textarea
+            <SpeechTextarea
               id="memo"
               name="memo"
               defaultValue={initialEvaluation?.memo}
-              style={{ ...inputStyle, minHeight: "3rem" }}
+              style={{ minHeight: "3rem" }}
             />
           </div>
         </div>
