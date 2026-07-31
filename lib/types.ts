@@ -18,12 +18,11 @@ export type WineEvaluation = {
 
   sweetness: number
   acidity: number
+  bitterness: number
+  saltiness: number
   tannin: number
-  body: number
+  astringency: number
   alcohol: number
-  fruitiness: number
-  minerality: number
-  finish: number
 
   aromaIntensity: number
   citrus: number
@@ -31,15 +30,12 @@ export type WineEvaluation = {
   tropical: number
   redFruit: number
   blackFruit: number
-  driedFruit: number
   floral: number
   herbal: number
-  green: number
   spice: number
   oak: number
   nutty: number
   earthy: number
-  aged: number
 
   comment?: string
 
@@ -51,27 +47,23 @@ export type WineEvaluation = {
 export const RATING_CRITERION_IDS = [
   "sweetness",
   "acidity",
+  "bitterness",
+  "saltiness",
   "tannin",
-  "body",
+  "astringency",
   "alcohol",
-  "fruitiness",
-  "minerality",
-  "finish",
   "aromaIntensity",
   "citrus",
   "stoneFruit",
   "tropical",
   "redFruit",
   "blackFruit",
-  "driedFruit",
   "floral",
   "herbal",
-  "green",
   "spice",
   "oak",
   "nutty",
   "earthy",
-  "aged",
 ] as const
 
 export type RatingCriterionId = (typeof RATING_CRITERION_IDS)[number]
