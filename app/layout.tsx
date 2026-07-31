@@ -4,7 +4,7 @@ import { SeedLocalEvaluations } from "@/components/seed-local-evaluations"
 import "./reset.css"
 
 export const metadata = {
-  title: "Wine Sommelier Evaluation Platform",
+  title: "Wine Hearing",
   description: "ソムリエ官能評価データ収集プラットフォーム",
 }
 
@@ -30,7 +30,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         >
           <Title>
             <span style={{ marginRight: ".4rem" }}>🍷</span>
-            Wine Sommelier
+            Wine Hearing
           </Title>
           <nav
             style={{
