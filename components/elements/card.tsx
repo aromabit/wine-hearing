@@ -6,7 +6,7 @@ export const Card: FC<ComponentProps<"div">> = ({ style, ...props }) => (
       background: "var(--color-surface)",
       border: "1px solid var(--color-border)",
       borderRadius: "var(--radius)",
-      boxShadow: "var(--shadow)",
+      boxShadow: "var(--shadow-lg)",
       ...style,
     }}
     {...props}
@@ -20,10 +20,11 @@ export const Tag: FC<ComponentProps<"span">> = ({ style, ...props }) => (
       background: "var(--color-bg)",
       color: "var(--color-text-muted)",
       border: "1px solid var(--color-border)",
-      borderRadius: 999,
-      fontSize: ".75rem",
+      borderRadius: 2,
+      fontSize: ".72rem",
       fontWeight: 600,
-      padding: ".15rem .6rem",
+      letterSpacing: ".03em",
+      padding: ".2rem .7rem",
       ...style,
     }}
     {...props}

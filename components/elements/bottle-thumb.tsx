@@ -8,6 +8,8 @@ export const BottleThumb: FC<{ size?: number }> = ({ size = 56 }) => (
       borderRadius: "50%",
       background:
         "radial-gradient(circle at 35% 30%, #d94f76, var(--color-primary) 70%)",
+      border: "1px solid var(--color-gold)",
+      boxShadow: "0 2px 6px rgba(43, 37, 35, 0.15)",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",

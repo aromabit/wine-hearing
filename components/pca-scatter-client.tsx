@@ -224,7 +224,7 @@ export const PcaScatterClient = ({ wines }: { wines: Wine[] }) => {
                   top: "1.25rem",
                   background: "var(--color-surface)",
                   border: "1px solid var(--color-border)",
-                  borderRadius: 8,
+                  borderRadius: 2,
                   boxShadow: "var(--shadow)",
                   padding: ".6rem .8rem",
                   fontSize: ".8rem",

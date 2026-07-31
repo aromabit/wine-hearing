@@ -16,7 +16,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <header
           style={{
             backgroundColor: "var(--color-surface)",
-            borderBottom: "1px solid var(--color-border)",
+            borderBottom: "2px solid var(--color-gold)",
+            boxShadow: "0 1px 3px rgba(43, 37, 35, 0.06)",
             padding: "0 1.5rem",
             position: "sticky",
             top: 0,

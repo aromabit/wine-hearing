@@ -6,18 +6,21 @@ const base: CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   gap: ".4rem",
-  borderRadius: 999,
+  borderRadius: 2,
   fontWeight: 700,
-  fontSize: ".875rem",
-  padding: ".55rem 1.25rem",
+  fontSize: ".8rem",
+  letterSpacing: ".02em",
+  padding: ".6rem 1.4rem",
   border: "1px solid transparent",
-  transition: "opacity .15s",
+  transition: "opacity .15s, box-shadow .15s, transform .15s",
 }
 
 const variants = {
   primary: {
-    background: "var(--color-primary)",
+    background:
+      "linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))",
     color: "#fff",
+    boxShadow: "0 2px 8px rgba(166, 9, 61, 0.28)",
   },
   outline: {
     background: "transparent",

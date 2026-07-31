@@ -73,7 +73,7 @@ export const JanLookup = ({
                 textAlign: "left",
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
-                borderRadius: 8,
+                borderRadius: 2,
                 padding: ".5rem .75rem",
               }}
             >
