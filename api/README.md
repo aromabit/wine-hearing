@@ -20,27 +20,29 @@
 
 同時書き込みは S3 の条件付き書き込み（`IfMatch` / `IfNoneMatch`）で検出し、最大5回リトライする。
 
+## パラメータ
+
+| 名前            | 説明                                                        |
+| --------------- | ----------------------------------------------------------- |
+| `ApiKey`        | クライアントが `x-api-key` ヘッダで送る共有シークレット     |
+| `AllowedOrigin` | CORS で許可するオリジン（例: `https://aromabit.github.io`） |
+
+## 環境変数（Lambda）
+
+| 名前          | 既定値              | 説明                      |
+| ------------- | ------------------- | ------------------------- |
+| `BUCKET_NAME` | スタックが自動設定  | データ保存先バケット      |
+| `OBJECT_KEY`  | `evaluations.json`  | 保存するオブジェクトキー  |
+| `API_KEY`     | `ApiKey` パラメータ | 空の場合すべて 401 を返す |
+
 ## デプロイ
+
+手順・運用・トラブルシュートは [`../DEPLOY.md`](../DEPLOY.md) を参照。
 
 ```sh
 cd api
-sam deploy --guided \
-  --stack-name wine-hearing-api \
-  --capabilities CAPABILITY_IAM \
-  --parameter-overrides \
-    ApiKey=<32文字程度のランダム文字列> \
-    AllowedOrigin=https://<user>.github.io
+sam deploy   # 初回は DEPLOY.md の --guided 手順から
 ```
-
-出力の `ApiUrl` をフロント側の環境変数に設定する。
-
-```sh
-# .env.local
-NEXT_PUBLIC_EVALUATIONS_API_URL=https://xxxxx.lambda-url.ap-northeast-1.on.aws
-NEXT_PUBLIC_EVALUATIONS_API_KEY=<ApiKey と同じ値>
-```
-
-GitHub Pages 側は、リポジトリの Variables に `EVALUATIONS_API_URL`、Secrets に `EVALUATIONS_API_KEY` を登録すればデプロイワークフローがビルド時に埋め込む。
 
 ## 注意
 

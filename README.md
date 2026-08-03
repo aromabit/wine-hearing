@@ -484,6 +484,7 @@ MVPでは以下を実装する。
 
 評価データは AWS Lambda (Function URL) 経由で S3 上の単一 JSON (`evaluations.json`) に保存する。
 
-- API 定義・デプロイ手順: [`api/README.md`](./api/README.md)
+- デプロイ手順・運用: [`DEPLOY.md`](./DEPLOY.md)
+- API 仕様: [`api/README.md`](./api/README.md)
 - フロントは API を正とし、LocalStorage は表示高速化とオフライン閲覧のためのキャッシュとして利用する
 - `NEXT_PUBLIC_EVALUATIONS_API_URL` が未設定の場合は LocalStorage のみで動作する（[`.env.example`](./.env.example) 参照）
