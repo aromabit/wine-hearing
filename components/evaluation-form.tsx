@@ -10,7 +10,7 @@ import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
 import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
-import { saveLocalEvaluation } from "@/lib/local-evaluations"
+import { saveEvaluation } from "@/lib/evaluation-store"
 
 export const EvaluationForm = ({
   initialEvaluation,
@@ -23,7 +23,7 @@ export const EvaluationForm = ({
   const tasteCriteria = RATING_CRITERIA.filter((c) => c.group === "taste")
   const aromaCriteria = RATING_CRITERIA.filter((c) => c.group === "aroma")
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(undefined)
     setPending(true)
@@ -81,13 +81,21 @@ export const EvaluationForm = ({
       memo: (body.memo as string) || undefined,
     }
 
-    saveLocalEvaluation(evaluation)
+    try {
+      await saveEvaluation(evaluation)
+    } catch (saveError) {
+      console.error("failed to save the evaluation", saveError)
+      setError("保存に失敗しました。通信環境を確認してもう一度お試しください。")
+      setPending(false)
+      return
+    }
+
     router.push(`/evaluations/detail?id=${evaluation.id}`)
   }
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => void handleSubmit(e)}
       style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
     >
       <Card style={{ padding: "1.25rem" }}>

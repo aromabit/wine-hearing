@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import { useLocalEvaluations } from "@/lib/use-local-evaluations"
+import { useEvaluations } from "@/lib/evaluation-store"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { computePca2D, PcaPoint, standardize } from "@/lib/pca"
 import { kMeans } from "@/lib/kmeans"
@@ -19,7 +19,7 @@ const CLUSTER_LABELS = ["クラスタ 1", "クラスタ 2", "クラスタ 3"]
 const CLUSTER_OPTIONS = [2, 3]
 
 export const PcaScatterClient = () => {
-  const { evaluations, loaded } = useLocalEvaluations()
+  const { evaluations, loaded } = useEvaluations()
   const [view, setView] = useState<"scatter" | "table">("scatter")
   const [clusterCount, setClusterCount] = useState(3)
   const [hoveredId, setHoveredId] = useState<string | null>(null)

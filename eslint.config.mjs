@@ -9,9 +9,13 @@ export default [
   { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
   { ignores: [".next", "out", "next-env.d.ts", "next.config.js"] },
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["scripts/**/*.mjs", "api/src/**/*.mjs"],
     languageOptions: {
-      globals: { process: "readonly", console: "readonly" },
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        Buffer: "readonly",
+      },
     },
   },
   pluginJs.configs.recommended,

@@ -2,12 +2,13 @@
 
 import { useSearchParams } from "next/navigation"
 import { EvaluationForm } from "@/components/evaluation-form"
-import { useLocalEvaluation } from "@/lib/use-local-evaluations"
+import { useEvaluation } from "@/lib/evaluation-store"
+import { isRemoteStorageEnabled } from "@/lib/evaluation-api"
 
 export const NewEvaluationClient = () => {
   const searchParams = useSearchParams()
   const editId = searchParams.get("editId")
-  const { evaluation: initialEvaluation, loaded } = useLocalEvaluation(editId)
+  const { evaluation: initialEvaluation, loaded } = useEvaluation(editId)
 
   if (!loaded) return null
 
@@ -15,7 +16,9 @@ export const NewEvaluationClient = () => {
     <div>
       <h2>{initialEvaluation ? "評価を編集" : "新しい評価を追加"}</h2>
       <p style={{ color: "var(--color-text-muted)", marginBottom: "1rem" }}>
-        評価はこのブラウザ内（LocalStorage）に保存されます。
+        {isRemoteStorageEnabled
+          ? "評価はクラウド（S3）に保存され、他の端末からも参照できます。"
+          : "評価はこのブラウザ内（LocalStorage）に保存されます。"}
       </p>
       <EvaluationForm initialEvaluation={initialEvaluation} />
     </div>

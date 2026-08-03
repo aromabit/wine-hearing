@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: wine-hearing evaluations API (Lambda Function URL + S3)
+
+Parameters:
+  ApiKey:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Shared secret that clients must send in the x-api-key header
+  AllowedOrigin:
+    Type: String
+    Default: "*"
+    Description: Origin allowed to call the function URL (e.g. https://<user>.github.io)
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 256
+    Architectures:
+      - arm64
+
+Resources:
+  EvaluationsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+
+  EvaluationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: index.handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref EvaluationsBucket
+          OBJECT_KEY: evaluations.json
+          API_KEY: !Ref ApiKey
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref EvaluationsBucket
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - !Ref AllowedOrigin
+          AllowMethods:
+            - GET
+            - PUT
+            - DELETE
+          AllowHeaders:
+            - content-type
+            - x-api-key
+          MaxAge: 300
+
+  EvaluationsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${EvaluationsFunction}"
+      RetentionInDays: 30
+
+Outputs:
+  ApiUrl:
+    Description: Function URL to set as NEXT_PUBLIC_EVALUATIONS_API_URL
+    Value: !GetAtt EvaluationsFunctionUrl.FunctionUrl
+  BucketName:
+    Description: S3 bucket holding evaluations.json
+    Value: !Ref EvaluationsBucket

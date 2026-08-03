@@ -1,14 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { useLocalEvaluations } from "@/lib/use-local-evaluations"
+import { useEvaluations } from "@/lib/evaluation-store"
 import { Card } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
 import { LinkButton } from "@/components/elements/button"
 import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
 
 export const EvaluationsListClient = () => {
-  const { evaluations, loaded } = useLocalEvaluations()
+  const { evaluations, loaded } = useEvaluations()
 
   return (
     <div>

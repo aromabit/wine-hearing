@@ -1,10 +1,10 @@
 "use client"
 
-import { useLocalEvaluations } from "@/lib/use-local-evaluations"
+import { useEvaluations } from "@/lib/evaluation-store"
 import { Button } from "@/components/elements/button"
 
 export const ExportEvaluationsButton = () => {
-  const { evaluations, loaded } = useLocalEvaluations()
+  const { evaluations, loaded } = useEvaluations()
 
   const handleExport = () => {
     const blob = new Blob([JSON.stringify(evaluations, null, 2)], {
