@@ -14,7 +14,7 @@ export const Header = () => {
         backgroundColor: "var(--color-surface)",
         borderBottom: "2px solid var(--color-gold)",
         boxShadow: "0 1px 3px rgba(43, 37, 35, 0.06)",
-        padding: ".75rem 1.5rem",
+        padding: ".75rem 1rem",
         position: "sticky",
         top: 0,
         zIndex: 10,
@@ -22,12 +22,12 @@ export const Header = () => {
         alignItems: "center",
         flexWrap: "wrap",
         gap: "1rem 2rem",
-        minHeight: "3.5rem",
+        minHeight: "2.75rem",
       }}
     >
       <Title>
         <span style={{ marginRight: ".4rem" }}>🍷</span>
-        Wine Hearing
+        Hearing
       </Title>
       <nav
         style={{

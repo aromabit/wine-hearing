@@ -8,7 +8,7 @@ export const Title: FC<ComponentProps<"h1">> = ({
   <h1
     style={{
       fontFamily: "var(--font-serif)",
-      fontSize: "1.25rem",
+      fontSize: "1.05rem",
       fontWeight: 700,
       letterSpacing: ".02em",
       color: "var(--color-primary)",
