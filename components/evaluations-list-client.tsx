@@ -6,9 +6,11 @@ import { Card } from "@/components/elements/card"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
 import { LinkButton } from "@/components/elements/button"
 import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
+import { useAdminMode } from "@/lib/admin-mode"
 
 export const EvaluationsListClient = () => {
   const { evaluations, loaded } = useEvaluations()
+  const { isAdmin } = useAdminMode()
 
   return (
     <div>
@@ -23,7 +25,7 @@ export const EvaluationsListClient = () => {
       >
         <h2 style={{ margin: 0 }}>評価一覧</h2>
         <div style={{ display: "flex", gap: ".5rem" }}>
-          <ExportEvaluationsButton />
+          {isAdmin && <ExportEvaluationsButton />}
           <LinkButton href="/evaluations/new">+ 評価を追加</LinkButton>
         </div>
       </div>

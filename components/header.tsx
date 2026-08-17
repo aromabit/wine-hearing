@@ -3,14 +3,10 @@
 import Link from "next/link"
 import { Title } from "@/components/elements/layout"
 import { useAdminMode } from "@/lib/admin-mode"
-import { clearCurrentUserId, useCurrentUserId } from "@/lib/current-user"
-import { useUsers } from "@/lib/user-store"
+import { UserMenu } from "@/components/user-menu"
 
 export const Header = () => {
-  const { isAdmin, toggleAdminMode } = useAdminMode()
-  const currentUserId = useCurrentUserId()
-  const { users } = useUsers()
-  const currentUserName = users.find((u) => u.id === currentUserId)?.name
+  const { isAdmin } = useAdminMode()
 
   return (
     <header
@@ -54,57 +50,7 @@ export const Header = () => {
           </Link>
         )}
       </nav>
-      {currentUserName && (
-        <div
-          style={{
-            marginLeft: "auto",
-            display: "flex",
-            alignItems: "center",
-            gap: ".5rem",
-            fontSize: ".85rem",
-            color: "var(--color-text-muted)",
-          }}
-        >
-          <span>
-            評価者: <strong style={{ color: "var(--color-text)" }}>{currentUserName}</strong>
-          </span>
-          <button
-            type="button"
-            onClick={clearCurrentUserId}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--color-primary)",
-              fontWeight: 600,
-              fontSize: ".8rem",
-              cursor: "pointer",
-              padding: 0,
-            }}
-          >
-            変更
-          </button>
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={toggleAdminMode}
-        aria-pressed={isAdmin}
-        style={{
-          marginLeft: "auto",
-          fontSize: ".8rem",
-          fontWeight: 600,
-          padding: ".35rem .75rem",
-          borderRadius: "999px",
-          border: isAdmin
-            ? "1px solid var(--color-primary)"
-            : "1px solid var(--color-border)",
-          backgroundColor: isAdmin ? "var(--color-primary)" : "transparent",
-          color: isAdmin ? "var(--color-surface)" : "var(--color-text-muted)",
-          cursor: "pointer",
-        }}
-      >
-        {isAdmin ? "管理者モード: ON" : "管理者モード"}
-      </button>
+      <UserMenu />
     </header>
   )
 }
