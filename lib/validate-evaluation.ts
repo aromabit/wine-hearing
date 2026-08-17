@@ -4,9 +4,6 @@ import { RatingCriterionId } from "./types"
 export function validateEvaluationInput(
   body: Record<string, unknown>,
 ): { error: string } | { vector: Record<RatingCriterionId, number> } {
-  if (!body.wineName || typeof body.wineName !== "string" || body.wineName.trim() === "") {
-    return { error: "ワイン名は必須です" }
-  }
   if (!body.evaluatorId || typeof body.evaluatorId !== "string") {
     return { error: "evaluatorId は必須です" }
   }

@@ -22,6 +22,9 @@ export const EvaluationForm = ({
   const router = useRouter()
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
+  const [showWineDetails, setShowWineDetails] = useState(
+    Boolean(initialEvaluation),
+  )
   const tasteCriteria = RATING_CRITERIA.filter((c) => c.group === "taste")
   const aromaCriteria = RATING_CRITERIA.filter((c) => c.group === "aroma")
   const { users } = useUsers()
@@ -40,7 +43,11 @@ export const EvaluationForm = ({
     for (const criterion of RATING_CRITERIA) {
       body[criterion.id] = formData.get(criterion.id)
     }
-    body.wineName = formData.get("wineName")
+    const wineNameRaw = formData.get("wineName")
+    body.wineName =
+      typeof wineNameRaw === "string" && wineNameRaw.trim() !== ""
+        ? wineNameRaw
+        : new Date().toLocaleString("ja-JP")
     body.evaluatorId = formData.get("evaluatorId")
     body.comment = formData.get("comment") || undefined
     body.tastingTemperature = formData.get("tastingTemperature") || undefined
@@ -105,17 +112,45 @@ export const EvaluationForm = ({
       onSubmit={(e) => void handleSubmit(e)}
       style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
     >
+      {!showWineDetails && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowWineDetails(true)}
+          style={{ width: "fit-content" }}
+        >
+          詳細入力
+        </Button>
+      )}
+
+      {showWineDetails && (
       <Card style={{ padding: "1.25rem" }}>
-        <h3 style={{ marginBottom: ".9rem" }}>ワイン情報</h3>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: ".9rem",
+          }}
+        >
+          <h3>ワイン情報</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setShowWineDetails(false)}
+            style={{ width: "fit-content" }}
+          >
+            閉じる
+          </Button>
+        </div>
         <div style={{ display: "grid", gap: ".9rem" }}>
           <div style={fieldStyle}>
             <label htmlFor="wineName" style={labelStyle}>
-              ワイン名 *
+              ワイン名
             </label>
             <input
               id="wineName"
               name="wineName"
-              required
               defaultValue={initialEvaluation?.wineName}
               style={inputStyle}
             />
@@ -207,6 +242,7 @@ export const EvaluationForm = ({
           </div>
         </div>
       </Card>
+      )}
 
       <div>
         <h3 style={{ marginBottom: ".75rem" }}>味覚・構造</h3>
