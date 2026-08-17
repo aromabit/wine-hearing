@@ -1,3 +1,8 @@
+export type User = {
+  id: string
+  name: string
+}
+
 export type WineEvaluation = {
   id: string
   evaluatorId: string

@@ -43,6 +43,11 @@ export const Header = () => {
         <Link href="/analysis" style={{ color: "var(--color-text)" }}>
           評価マップ
         </Link>
+        {isAdmin && (
+          <Link href="/users" style={{ color: "var(--color-text)" }}>
+            ユーザー管理
+          </Link>
+        )}
       </nav>
       <button
         type="button"

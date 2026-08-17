@@ -9,6 +9,7 @@ const s3 = new S3Client({})
 
 const BUCKET = process.env.BUCKET_NAME
 const KEY = process.env.OBJECT_KEY ?? "evaluations.json"
+const USERS_KEY = process.env.USERS_OBJECT_KEY ?? "users.json"
 const API_KEY = process.env.API_KEY ?? ""
 
 const MAX_WRITE_ATTEMPTS = 5
@@ -59,30 +60,30 @@ function authorized(headers) {
   return a.length === b.length && timingSafeEqual(a, b)
 }
 
-async function readAll() {
+async function readAll(key) {
   try {
     const result = await s3.send(
-      new GetObjectCommand({ Bucket: BUCKET, Key: KEY })
+      new GetObjectCommand({ Bucket: BUCKET, Key: key })
     )
     const parsed = JSON.parse(await result.Body.transformToString())
     return {
-      evaluations: Array.isArray(parsed) ? parsed : [],
+      items: Array.isArray(parsed) ? parsed : [],
       etag: result.ETag,
     }
   } catch (error) {
     if (error.name === "NoSuchKey" || error.$metadata?.httpStatusCode === 404) {
-      return { evaluations: [], etag: null }
+      return { items: [], etag: null }
     }
     throw error
   }
 }
 
-async function writeAll(evaluations, etag) {
+async function writeAll(key, items, etag) {
   await s3.send(
     new PutObjectCommand({
       Bucket: BUCKET,
-      Key: KEY,
-      Body: JSON.stringify(evaluations),
+      Key: key,
+      Body: JSON.stringify(items),
       ContentType: "application/json",
       ...(etag ? { IfMatch: etag } : { IfNoneMatch: "*" }),
     })
@@ -90,15 +91,15 @@ async function writeAll(evaluations, etag) {
 }
 
 /**
- * Read-modify-write evaluations.json under an S3 conditional write so that
- * concurrent writers cannot silently overwrite each other.
+ * Read-modify-write a JSON array object under an S3 conditional write so
+ * that concurrent writers cannot silently overwrite each other.
  */
-async function mutate(apply) {
+async function mutate(key, apply) {
   for (let attempt = 0; attempt < MAX_WRITE_ATTEMPTS; attempt++) {
-    const { evaluations, etag } = await readAll()
-    const next = apply(evaluations)
+    const { items, etag } = await readAll(key)
+    const next = apply(items)
     try {
-      await writeAll(next, etag)
+      await writeAll(key, next, etag)
       return next
     } catch (error) {
       const status = error.$metadata?.httpStatusCode
@@ -148,22 +149,44 @@ function validateEvaluation(value, id) {
   return value
 }
 
+function validateUser(value, id) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    throw new HttpError(400, "user must be an object")
+  }
+  if (value.id !== id) {
+    throw new HttpError(400, "id in body does not match the path")
+  }
+  if (typeof value.name !== "string" || value.name.trim() === "") {
+    throw new HttpError(400, "name is required")
+  }
+  return value
+}
+
 async function route(event) {
   const method = event.requestContext?.http?.method ?? "GET"
   const segments = (event.rawPath ?? "/").split("/").filter(Boolean)
+  const resource = segments[0]
 
-  if (segments[0] !== "evaluations" || segments.length > 2) {
-    throw new HttpError(404, "not found")
+  if (resource === "users") {
+    return routeUsers(method, segments, event)
   }
+  if (resource === "evaluations") {
+    return routeEvaluations(method, segments, event)
+  }
+  throw new HttpError(404, "not found")
+}
+
+async function routeEvaluations(method, segments, event) {
+  if (segments.length > 2) throw new HttpError(404, "not found")
   const id = segments[1] ? decodeURIComponent(segments[1]) : null
 
   if (method === "GET" && id === null) {
-    const { evaluations } = await readAll()
+    const { items: evaluations } = await readAll(KEY)
     return respond(200, { evaluations })
   }
 
   if (method === "GET") {
-    const { evaluations } = await readAll()
+    const { items: evaluations } = await readAll(KEY)
     const evaluation = evaluations.find((item) => item.id === id)
     if (!evaluation) throw new HttpError(404, "evaluation not found")
     return respond(200, { evaluation })
@@ -171,7 +194,7 @@ async function route(event) {
 
   if (method === "PUT" && id !== null) {
     const evaluation = validateEvaluation(parseBody(event), id)
-    await mutate((evaluations) => {
+    await mutate(KEY, (evaluations) => {
       const index = evaluations.findIndex((item) => item.id === id)
       if (index === -1) return [...evaluations, evaluation]
       return evaluations.map((item, i) => (i === index ? evaluation : item))
@@ -180,7 +203,43 @@ async function route(event) {
   }
 
   if (method === "DELETE" && id !== null) {
-    await mutate((evaluations) => evaluations.filter((item) => item.id !== id))
+    await mutate(KEY, (evaluations) =>
+      evaluations.filter((item) => item.id !== id)
+    )
+    return respond(204)
+  }
+
+  throw new HttpError(405, "method not allowed")
+}
+
+async function routeUsers(method, segments, event) {
+  if (segments.length > 2) throw new HttpError(404, "not found")
+  const id = segments[1] ? decodeURIComponent(segments[1]) : null
+
+  if (method === "GET" && id === null) {
+    const { items: users } = await readAll(USERS_KEY)
+    return respond(200, { users })
+  }
+
+  if (method === "GET") {
+    const { items: users } = await readAll(USERS_KEY)
+    const user = users.find((item) => item.id === id)
+    if (!user) throw new HttpError(404, "user not found")
+    return respond(200, { user })
+  }
+
+  if (method === "PUT" && id !== null) {
+    const user = validateUser(parseBody(event), id)
+    await mutate(USERS_KEY, (users) => {
+      const index = users.findIndex((item) => item.id === id)
+      if (index === -1) return [...users, user]
+      return users.map((item, i) => (i === index ? user : item))
+    })
+    return respond(200, { user })
+  }
+
+  if (method === "DELETE" && id !== null) {
+    await mutate(USERS_KEY, (users) => users.filter((item) => item.id !== id))
     return respond(204)
   }
 

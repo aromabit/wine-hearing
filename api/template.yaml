@@ -46,6 +46,7 @@ Resources:
         Variables:
           BUCKET_NAME: !Ref EvaluationsBucket
           OBJECT_KEY: evaluations.json
+          USERS_OBJECT_KEY: users.json
           API_KEY: !Ref ApiKey
       Policies:
         - S3CrudPolicy:

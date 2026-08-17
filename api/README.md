@@ -1,6 +1,6 @@
 # Evaluations API (Lambda + S3)
 
-評価データを S3 上の単一 JSON (`evaluations.json`) に保存する Lambda Function URL。
+評価データを S3 上の単一 JSON (`evaluations.json`) に、ユーザーデータを `users.json` に保存する Lambda Function URL。
 
 ## 構成
 
@@ -17,6 +17,10 @@
 | GET      | `/evaluations/{id}` | 1件取得 `{ evaluation: {...} }` |
 | PUT      | `/evaluations/{id}` | 追加・更新（body は評価1件）    |
 | DELETE   | `/evaluations/{id}` | 削除                            |
+| GET      | `/users`             | 全件取得 `{ users: [] }`        |
+| GET      | `/users/{id}`        | 1件取得 `{ user: {...} }`       |
+| PUT      | `/users/{id}`        | 追加・更新（body は `{ id, name }`）|
+| DELETE   | `/users/{id}`        | 削除                            |
 
 同時書き込みは S3 の条件付き書き込み（`IfMatch` / `IfNoneMatch`）で検出し、最大5回リトライする。
 
@@ -31,9 +35,10 @@
 
 | 名前          | 既定値              | 説明                      |
 | ------------- | ------------------- | ------------------------- |
-| `BUCKET_NAME` | スタックが自動設定  | データ保存先バケット      |
-| `OBJECT_KEY`  | `evaluations.json`  | 保存するオブジェクトキー  |
-| `API_KEY`     | `ApiKey` パラメータ | 空の場合すべて 401 を返す |
+| `BUCKET_NAME`       | スタックが自動設定  | データ保存先バケット           |
+| `OBJECT_KEY`        | `evaluations.json`  | 評価データのオブジェクトキー   |
+| `USERS_OBJECT_KEY`  | `users.json`         | ユーザーデータのオブジェクトキー |
+| `API_KEY`           | `ApiKey` パラメータ | 空の場合すべて 401 を返す      |
 
 ## デプロイ
 
