@@ -7,10 +7,20 @@ import { BottleThumb } from "@/components/elements/bottle-thumb"
 import { LinkButton } from "@/components/elements/button"
 import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
 import { useAdminMode } from "@/lib/admin-mode"
+import { useCurrentUserId } from "@/lib/current-user"
+import { useUsers } from "@/lib/user-store"
 
 export const EvaluationsListClient = () => {
   const { evaluations, loaded } = useEvaluations()
   const { isAdmin } = useAdminMode()
+  const { users } = useUsers()
+  const currentUserId = useCurrentUserId()
+  const currentUserName = users.find((u) => u.id === currentUserId)?.name
+
+  // 管理者以外は自分が評価者の項目のみ表示する。
+  const visibleEvaluations = isAdmin
+    ? evaluations
+    : evaluations.filter((evaluation) => evaluation.evaluatorId === currentUserName)
 
   return (
     <div>
@@ -29,13 +39,13 @@ export const EvaluationsListClient = () => {
           <LinkButton href="/evaluations/new">+ 評価を追加</LinkButton>
         </div>
       </div>
-      {!loaded ? null : evaluations.length === 0 ? (
+      {!loaded ? null : visibleEvaluations.length === 0 ? (
         <p style={{ color: "var(--color-text-muted)" }}>
           評価データはまだありません。「+ 評価を追加」から評価を登録できます。
         </p>
       ) : (
         <div style={{ display: "grid", gap: ".6rem" }}>
-          {evaluations
+          {visibleEvaluations
             .slice()
             .sort((a, b) => b.evaluatedAt.localeCompare(a.evaluatedAt))
             .map((evaluation) => (
