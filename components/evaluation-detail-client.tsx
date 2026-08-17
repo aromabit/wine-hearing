@@ -20,7 +20,7 @@ export const EvaluationDetailClient = () => {
       <div>
         <h2>評価が見つかりません</h2>
         <p>
-          <Link href="/evaluations">評価一覧</Link> に戻ってください。
+          <Link href="/">評価一覧</Link> に戻ってください。
         </p>
       </div>
     )
@@ -35,7 +35,7 @@ export const EvaluationDetailClient = () => {
       alert("削除に失敗しました。通信環境を確認してもう一度お試しください。")
       return
     }
-    router.push("/evaluations")
+    router.push("/")
   }
 
   return (

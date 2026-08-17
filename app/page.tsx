@@ -1,22 +1,8 @@
 import { FC } from "react"
-import { LinkButton } from "@/components/elements/button"
+import { EvaluationsListClient } from "@/components/evaluations-list-client"
 
 const Page: FC = () => {
-  return (
-    <div style={{ display: "grid", gap: "1rem", textAlign: "center", padding: "3rem 0" }}>
-      <div style={{ fontSize: "3rem" }}>🍷</div>
-      <h2 style={{ margin: 0 }}>Wine Hearing</h2>
-      <p style={{ color: "var(--color-text-muted)" }}>
-        ソムリエによる23次元の官能評価を記録・蓄積します。
-      </p>
-      <div style={{ display: "flex", gap: "1rem", justifyContent: "center" }}>
-        <LinkButton href="/evaluations/new">評価を追加</LinkButton>
-        <LinkButton href="/evaluations" variant="outline">
-          評価一覧へ
-        </LinkButton>
-      </div>
-    </div>
-  )
+  return <EvaluationsListClient />
 }
 
 export default Page
