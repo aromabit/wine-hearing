@@ -6,12 +6,14 @@ import { deleteEvaluation, useEvaluation } from "@/lib/evaluation-store"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
 import { Card, Tag } from "@/components/elements/card"
 import { Button, LinkButton } from "@/components/elements/button"
+import { useAdminMode } from "@/lib/admin-mode"
 
 export const EvaluationDetailClient = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
   const id = searchParams.get("id")
   const { evaluation, loaded } = useEvaluation(id)
+  const { isAdmin } = useAdminMode()
 
   if (!loaded) return null
 
@@ -59,13 +61,15 @@ export const EvaluationDetailClient = () => {
             >
               編集
             </LinkButton>
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => void handleDelete()}
-            >
-              削除
-            </Button>
+            {isAdmin && (
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => void handleDelete()}
+              >
+                削除
+              </Button>
+            )}
           </div>
         </div>
 
