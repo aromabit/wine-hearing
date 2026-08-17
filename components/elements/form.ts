@@ -1,6 +1,10 @@
 import { CSSProperties } from "react"
 
-export const fieldStyle: CSSProperties = { display: "grid", gap: ".3rem" }
+export const fieldStyle: CSSProperties = {
+  display: "grid",
+  gap: ".3rem",
+  minWidth: 0,
+}
 
 export const labelStyle: CSSProperties = {
   fontSize: ".8rem",
@@ -9,6 +13,7 @@ export const labelStyle: CSSProperties = {
 }
 
 export const inputStyle: CSSProperties = {
+  width: "100%",
   padding: ".6rem .75rem",
   background: "var(--color-surface)",
   color: "var(--color-text)",
