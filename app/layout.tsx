@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { SeedLocalEvaluations } from "@/components/seed-local-evaluations"
+import { CurrentUserGate } from "@/components/current-user-gate"
 import { AdminModeProvider } from "@/lib/admin-mode"
 import "./reset.css"
 
@@ -14,27 +15,29 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body>
         <AdminModeProvider>
           <SeedLocalEvaluations />
-          <Header />
-          <main
-            style={{
-              minHeight: "calc(100dvh - 5.625rem)",
-              padding: "1.5rem",
-              maxWidth: "960px",
-              margin: "0 auto",
-            }}
-          >
-            {children}
-          </main>
-          <footer
-            style={{
-              borderTop: "1px solid var(--color-border)",
-              color: "var(--color-text-muted)",
-              fontSize: ".75rem",
-              padding: "1rem 1.5rem",
-            }}
-          >
-            <p>&copy; ScentifAI</p>
-          </footer>
+          <CurrentUserGate>
+            <Header />
+            <main
+              style={{
+                minHeight: "calc(100dvh - 5.625rem)",
+                padding: "1.5rem",
+                maxWidth: "960px",
+                margin: "0 auto",
+              }}
+            >
+              {children}
+            </main>
+            <footer
+              style={{
+                borderTop: "1px solid var(--color-border)",
+                color: "var(--color-text-muted)",
+                fontSize: ".75rem",
+                padding: "1rem 1.5rem",
+              }}
+            >
+              <p>&copy; ScentifAI</p>
+            </footer>
+          </CurrentUserGate>
         </AdminModeProvider>
       </body>
     </html>

@@ -3,9 +3,14 @@
 import Link from "next/link"
 import { Title } from "@/components/elements/layout"
 import { useAdminMode } from "@/lib/admin-mode"
+import { clearCurrentUserId, useCurrentUserId } from "@/lib/current-user"
+import { useUsers } from "@/lib/user-store"
 
 export const Header = () => {
   const { isAdmin, toggleAdminMode } = useAdminMode()
+  const currentUserId = useCurrentUserId()
+  const { users } = useUsers()
+  const currentUserName = users.find((u) => u.id === currentUserId)?.name
 
   return (
     <header
@@ -49,6 +54,37 @@ export const Header = () => {
           </Link>
         )}
       </nav>
+      {currentUserName && (
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            alignItems: "center",
+            gap: ".5rem",
+            fontSize: ".85rem",
+            color: "var(--color-text-muted)",
+          }}
+        >
+          <span>
+            評価者: <strong style={{ color: "var(--color-text)" }}>{currentUserName}</strong>
+          </span>
+          <button
+            type="button"
+            onClick={clearCurrentUserId}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--color-primary)",
+              fontWeight: 600,
+              fontSize: ".8rem",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            変更
+          </button>
+        </div>
+      )}
       <button
         type="button"
         onClick={toggleAdminMode}

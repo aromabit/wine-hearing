@@ -1,8 +1,7 @@
 "use client"
 
-import { FormEvent, useMemo, useState } from "react"
+import { FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { RatingSlider } from "@/components/rating-slider"
 import { WineEvaluation } from "@/lib/types"
@@ -13,6 +12,7 @@ import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
 import { saveEvaluation } from "@/lib/evaluation-store"
 import { useUsers } from "@/lib/user-store"
+import { useCurrentUserId } from "@/lib/current-user"
 
 export const EvaluationForm = ({
   initialEvaluation,
@@ -25,11 +25,10 @@ export const EvaluationForm = ({
   const tasteCriteria = RATING_CRITERIA.filter((c) => c.group === "taste")
   const aromaCriteria = RATING_CRITERIA.filter((c) => c.group === "aroma")
   const { users } = useUsers()
-  const evaluatorNames = useMemo(() => {
-    const names = users.map((u) => u.name)
-    const current = initialEvaluation?.evaluatorId
-    return current && !names.includes(current) ? [current, ...names] : names
-  }, [users, initialEvaluation?.evaluatorId])
+  const currentUserId = useCurrentUserId()
+  const currentUserName = users.find((u) => u.id === currentUserId)?.name
+  // 編集時は元の評価者を維持、新規作成時は現在選択中のユーザーで固定する。
+  const evaluatorId = initialEvaluation?.evaluatorId ?? currentUserName ?? ""
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -255,30 +254,13 @@ export const EvaluationForm = ({
             <label htmlFor="evaluatorId" style={labelStyle}>
               評価者ID *
             </label>
-            {evaluatorNames.length === 0 ? (
-              <p style={{ fontSize: ".85rem", color: "var(--color-text-muted)" }}>
-                ユーザーが未登録です。
-                <Link href="/users">ユーザー管理</Link>
-                （管理者モード）から追加してください。
-              </p>
-            ) : (
-              <select
-                id="evaluatorId"
-                name="evaluatorId"
-                required
-                defaultValue={initialEvaluation?.evaluatorId ?? ""}
-                style={inputStyle}
-              >
-                <option value="" disabled>
-                  選択してください
-                </option>
-                {evaluatorNames.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            )}
+            <input
+              id="evaluatorId"
+              value={evaluatorId}
+              readOnly
+              style={{ ...inputStyle, color: "var(--color-text-muted)" }}
+            />
+            <input type="hidden" name="evaluatorId" value={evaluatorId} />
           </div>
           <div style={fieldStyle}>
             <label htmlFor="tastingTemperature" style={labelStyle}>
