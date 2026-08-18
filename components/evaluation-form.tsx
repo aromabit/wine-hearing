@@ -105,9 +105,6 @@ export const EvaluationForm = ({
         : new Date().toLocaleString("ja-JP")
     body.evaluatorId = formData.get("evaluatorId")
     body.comment = formData.get("comment") || undefined
-    body.tastingTemperature = formData.get("tastingTemperature") || undefined
-    body.decanting = formData.get("decanting") === "on"
-    body.memo = formData.get("memo") || undefined
 
     const result = validateEvaluationInput(body)
     if ("error" in result) {
@@ -143,11 +140,6 @@ export const EvaluationForm = ({
       evaluatedAt: initialEvaluation?.evaluatedAt ?? new Date().toISOString(),
       ...result.vector,
       comment: (body.comment as string) || undefined,
-      tastingTemperature: body.tastingTemperature
-        ? Number(body.tastingTemperature)
-        : undefined,
-      decanting: body.decanting as boolean,
-      memo: (body.memo as string) || undefined,
       imageIds:
         existingImageIds.length + newImages.length > 0
           ? [...existingImageIds, ...newImages.map((img) => img.id)]
@@ -448,41 +440,6 @@ export const EvaluationForm = ({
               style={{ ...inputStyle, color: "var(--color-text-muted)" }}
             />
             <input type="hidden" name="evaluatorId" value={evaluatorId} />
-          </div>
-          <div style={fieldStyle}>
-            <label htmlFor="tastingTemperature" style={labelStyle}>
-              テイスティング温度（℃）
-            </label>
-            <input
-              id="tastingTemperature"
-              name="tastingTemperature"
-              type="number"
-              step="0.5"
-              defaultValue={initialEvaluation?.tastingTemperature}
-              style={inputStyle}
-            />
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
-            <input
-              id="decanting"
-              name="decanting"
-              type="checkbox"
-              defaultChecked={initialEvaluation?.decanting}
-            />
-            <label htmlFor="decanting" style={labelStyle}>
-              デキャンタージュ有
-            </label>
-          </div>
-          <div style={fieldStyle}>
-            <label htmlFor="memo" style={labelStyle}>
-              評価メモ
-            </label>
-            <SpeechTextarea
-              id="memo"
-              name="memo"
-              defaultValue={initialEvaluation?.memo}
-              style={{ minHeight: "3rem" }}
-            />
           </div>
         </div>
       </Card>

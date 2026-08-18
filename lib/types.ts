@@ -41,10 +41,6 @@ export type WineEvaluation = {
 
   comment?: string
 
-  tastingTemperature?: number
-  decanting?: boolean
-  memo?: string
-
   /** 画像ID（UUID）の配列。最大 MAX_EVALUATION_IMAGES 枚。実体は S3 に別保存。 */
   imageIds?: string[]
 }

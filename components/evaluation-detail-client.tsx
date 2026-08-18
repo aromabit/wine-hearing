@@ -120,18 +120,6 @@ export const EvaluationDetailClient = () => {
           <dd>{evaluation.evaluatorId}</dd>
           <dt style={{ color: "var(--color-text-muted)" }}>評価日時</dt>
           <dd>{new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}</dd>
-          <dt style={{ color: "var(--color-text-muted)" }}>
-            テイスティング温度
-          </dt>
-          <dd>
-            {evaluation.tastingTemperature != null
-              ? `${evaluation.tastingTemperature}℃`
-              : "-"}
-          </dd>
-          <dt style={{ color: "var(--color-text-muted)" }}>デキャンタージュ</dt>
-          <dd>{evaluation.decanting ? "有" : "無"}</dd>
-          <dt style={{ color: "var(--color-text-muted)" }}>評価メモ</dt>
-          <dd>{evaluation.memo || "-"}</dd>
         </dl>
       </Card>
 
