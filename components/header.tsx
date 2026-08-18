@@ -25,10 +25,12 @@ export const Header = () => {
         minHeight: "2.75rem",
       }}
     >
-      <Title>
-        <span style={{ marginRight: ".4rem" }}>🍷</span>
-        Hearing
-      </Title>
+      <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+        <Title>
+          <span style={{ marginRight: ".4rem" }}>🍷</span>
+          Hearing
+        </Title>
+      </Link>
       <nav
         style={{
           display: "flex",
@@ -38,9 +40,6 @@ export const Header = () => {
           fontSize: ".9rem",
         }}
       >
-        <Link href="/" style={{ color: "var(--color-text)" }}>
-          評価
-        </Link>
         <Link href="/analysis" style={{ color: "var(--color-text)" }}>
           評価マップ
         </Link>
