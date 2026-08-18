@@ -44,9 +44,7 @@ export const EvaluationForm = ({
   const router = useRouter()
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
-  const [showWineDetails, setShowWineDetails] = useState(
-    Boolean(initialEvaluation),
-  )
+  const [showWineDetails, setShowWineDetails] = useState(false)
   const [existingImageIds, setExistingImageIds] = useState<string[]>(
     initialEvaluation?.imageIds ?? [],
   )

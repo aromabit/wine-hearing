@@ -13,7 +13,9 @@ export const NewEvaluationClient = () => {
 
   return (
     <div>
-      <h2>{initialEvaluation ? "評価を編集" : "新しい評価を追加"}</h2>
+      <h2 style={{ marginBottom: "1rem" }}>
+        {initialEvaluation ? "評価を編集" : "新しい評価を追加"}
+      </h2>
       <EvaluationForm initialEvaluation={initialEvaluation} />
     </div>
   )
