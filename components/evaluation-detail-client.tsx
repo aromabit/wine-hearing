@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { deleteEvaluation, useEvaluation } from "@/lib/evaluation-store"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
+import { EvaluationImage } from "@/components/evaluation-image"
 import { Card, Tag } from "@/components/elements/card"
 import { Button, LinkButton } from "@/components/elements/button"
 import { useAdminMode } from "@/lib/admin-mode"
@@ -133,6 +134,27 @@ export const EvaluationDetailClient = () => {
           <dd>{evaluation.memo || "-"}</dd>
         </dl>
       </Card>
+
+      {evaluation.imageIds && evaluation.imageIds.length > 0 && (
+        <Card style={{ padding: "1.25rem" }}>
+          <h3 style={{ marginBottom: ".75rem" }}>写真</h3>
+          <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
+            {evaluation.imageIds.map((imageId) => (
+              <EvaluationImage
+                key={imageId}
+                evaluationId={evaluation.id}
+                imageId={imageId}
+                style={{
+                  width: 120,
+                  height: 120,
+                  borderRadius: 8,
+                  border: "1px solid var(--color-border)",
+                }}
+              />
+            ))}
+          </div>
+        </Card>
+      )}
 
       <EvaluationVectorChart evaluation={evaluation} />
 

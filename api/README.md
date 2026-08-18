@@ -16,7 +16,10 @@
 | GET      | `/evaluations`      | 全件取得 `{ evaluations: [] }`  |
 | GET      | `/evaluations/{id}` | 1件取得 `{ evaluation: {...} }` |
 | PUT      | `/evaluations/{id}` | 追加・更新（body は評価1件）    |
-| DELETE   | `/evaluations/{id}` | 削除                            |
+| DELETE   | `/evaluations/{id}` | 削除（紐づく画像も削除）        |
+| GET      | `/evaluations/{id}/images/{imageId}` | 画像1枚取得（バイナリ） |
+| PUT      | `/evaluations/{id}/images/{imageId}` | 画像1枚登録（body は画像バイナリ、`content-type: image/jpeg\|png\|webp`、最大4MB） |
+| DELETE   | `/evaluations/{id}/images/{imageId}` | 画像1枚削除             |
 | GET      | `/users`             | 全件取得 `{ users: [] }`        |
 | GET      | `/users/{id}`        | 1件取得 `{ user: {...} }`       |
 | PUT      | `/users/{id}`        | 追加・更新（body は `{ id, name }`）|
@@ -53,3 +56,4 @@ sam deploy   # 初回は DEPLOY.md の --guided 手順から
 
 - API キーは静的ビルドに埋め込まれるため、公開ページでは簡易的な抑止にしかならない。厳密な保護が必要なら Cognito などの認証に切り替える。
 - `AllowedOrigin` を `*` のままにしない。
+- 画像は `imageId`（UUID）ごとに S3 `images/{evaluationId}/{imageId}` へ保存する。評価1件につき最大3枚（`evaluation.imageIds` で管理）。評価本体との整合はクライアント側の責務で、画像PUT時にサーバ側で評価の存在確認はしない。

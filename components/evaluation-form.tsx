@@ -1,18 +1,40 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 import { useRouter } from "next/navigation"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { RatingSlider } from "@/components/rating-slider"
-import { WineEvaluation } from "@/lib/types"
+import { MAX_EVALUATION_IMAGES, WineEvaluation } from "@/lib/types"
 import { fieldStyle, inputStyle, labelStyle } from "@/components/elements/form"
 import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
 import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
 import { saveEvaluation } from "@/lib/evaluation-store"
+import {
+  deleteRemoteEvaluationImage,
+  isRemoteStorageEnabled,
+  putRemoteEvaluationImage,
+} from "@/lib/evaluation-api"
+import { EvaluationImage } from "@/components/evaluation-image"
 import { useUsers } from "@/lib/user-store"
 import { useCurrentUserId } from "@/lib/current-user"
+
+type NewImage = { id: string; file: File; previewUrl: string }
+
+const removeImageButtonStyle = {
+  position: "absolute" as const,
+  top: -6,
+  right: -6,
+  width: 22,
+  height: 22,
+  borderRadius: "50%",
+  border: "1px solid var(--color-border)",
+  background: "var(--color-surface)",
+  color: "var(--color-text)",
+  lineHeight: 1,
+  cursor: "pointer",
+}
 
 export const EvaluationForm = ({
   initialEvaluation,
@@ -25,6 +47,41 @@ export const EvaluationForm = ({
   const [showWineDetails, setShowWineDetails] = useState(
     Boolean(initialEvaluation),
   )
+  const [existingImageIds, setExistingImageIds] = useState<string[]>(
+    initialEvaluation?.imageIds ?? [],
+  )
+  const [removedImageIds, setRemovedImageIds] = useState<string[]>([])
+  const [newImages, setNewImages] = useState<NewImage[]>([])
+  const imageCount = existingImageIds.length + newImages.length
+
+  const handleAddImages = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    const remaining = MAX_EVALUATION_IMAGES - imageCount
+    const accepted = files.slice(0, remaining)
+    setNewImages((prev) => [
+      ...prev,
+      ...accepted.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+        previewUrl: URL.createObjectURL(file),
+      })),
+    ])
+    e.target.value = ""
+  }
+
+  const handleRemoveExistingImage = (imageId: string) => {
+    setExistingImageIds((prev) => prev.filter((id) => id !== imageId))
+    setRemovedImageIds((prev) => [...prev, imageId])
+  }
+
+  const handleRemoveNewImage = (id: string) => {
+    setNewImages((prev) => {
+      const target = prev.find((img) => img.id === id)
+      if (target) URL.revokeObjectURL(target.previewUrl)
+      return prev.filter((img) => img.id !== id)
+    })
+  }
+
   const tasteCriteria = RATING_CRITERIA.filter((c) => c.group === "taste")
   const aromaCriteria = RATING_CRITERIA.filter((c) => c.group === "aroma")
   const { users } = useUsers()
@@ -93,9 +150,25 @@ export const EvaluationForm = ({
         : undefined,
       decanting: body.decanting as boolean,
       memo: (body.memo as string) || undefined,
+      imageIds:
+        existingImageIds.length + newImages.length > 0
+          ? [...existingImageIds, ...newImages.map((img) => img.id)]
+          : undefined,
     }
 
     try {
+      if (isRemoteStorageEnabled) {
+        await Promise.all(
+          removedImageIds.map((imageId) =>
+            deleteRemoteEvaluationImage(evaluation.id, imageId),
+          ),
+        )
+        await Promise.all(
+          newImages.map((img) =>
+            putRemoteEvaluationImage(evaluation.id, img.id, img.file),
+          ),
+        )
+      }
       await saveEvaluation(evaluation)
     } catch (saveError) {
       console.error("failed to save the evaluation", saveError)
@@ -242,6 +315,86 @@ export const EvaluationForm = ({
           </div>
         </div>
       </Card>
+      )}
+
+      {isRemoteStorageEnabled && (
+        <Card style={{ padding: "1.25rem" }}>
+          <h3 style={{ marginBottom: ".9rem" }}>
+            写真（最大{MAX_EVALUATION_IMAGES}枚）
+          </h3>
+          <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
+            {existingImageIds.map((imageId) => (
+              <div key={imageId} style={{ position: "relative" }}>
+                <EvaluationImage
+                  evaluationId={initialEvaluation?.id ?? ""}
+                  imageId={imageId}
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: 8,
+                    border: "1px solid var(--color-border)",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveExistingImage(imageId)}
+                  aria-label="この写真を削除"
+                  style={removeImageButtonStyle}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {newImages.map((img) => (
+              <div key={img.id} style={{ position: "relative" }}>
+                <img
+                  src={img.previewUrl}
+                  alt=""
+                  style={{
+                    width: 96,
+                    height: 96,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    border: "1px solid var(--color-border)",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveNewImage(img.id)}
+                  aria-label="この写真を削除"
+                  style={removeImageButtonStyle}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {imageCount < MAX_EVALUATION_IMAGES && (
+              <label
+                style={{
+                  width: 96,
+                  height: 96,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 8,
+                  border: "1px dashed var(--color-border)",
+                  color: "var(--color-text-muted)",
+                  fontSize: ".8rem",
+                  cursor: "pointer",
+                }}
+              >
+                + 追加
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  onChange={handleAddImages}
+                  style={{ display: "none" }}
+                />
+              </label>
+            )}
+          </div>
+        </Card>
       )}
 
       <div>
