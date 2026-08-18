@@ -54,6 +54,14 @@ export const EvaluationsListClient = () => {
               const missing = missingParts(evaluation, {
                 includeImage: isRemoteStorageEnabled,
               })
+              const totalParts = isRemoteStorageEnabled ? 3 : 2
+              // 進捗3段階: 未着手(グレー) / 一部記入(ゴールド) / 記入済み(ワイン色)
+              const progressColor =
+                missing.length === 0
+                  ? "var(--color-primary)"
+                  : missing.length === totalParts
+                    ? "var(--color-border)"
+                    : "var(--color-gold)"
               return (
                 <Link
                   key={evaluation.id}
@@ -70,14 +78,8 @@ export const EvaluationsListClient = () => {
                       display: "flex",
                       alignItems: "center",
                       gap: ".9rem",
-                      borderLeft:
-                        missing.length > 0
-                          ? "8px solid var(--color-gold)"
-                          : "8px solid var(--color-primary)",
-                      background:
-                        missing.length > 0
-                          ? "color-mix(in srgb, var(--color-gold) 8%, var(--color-surface))"
-                          : "color-mix(in srgb, var(--color-primary) 6%, var(--color-surface))",
+                      borderLeft: `8px solid ${progressColor}`,
+                      background: `color-mix(in srgb, ${progressColor} 8%, var(--color-surface))`,
                     }}
                   >
                     <BottleThumb
