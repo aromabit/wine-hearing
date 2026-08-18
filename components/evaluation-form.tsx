@@ -402,7 +402,7 @@ export const EvaluationForm = ({
             <RatingSlider
               key={criterion.id}
               criterion={criterion}
-              defaultValue={initialEvaluation?.[criterion.id]}
+              defaultValue={initialEvaluation?.[criterion.id] ?? undefined}
             />
           ))}
         </div>
@@ -415,7 +415,7 @@ export const EvaluationForm = ({
             <RatingSlider
               key={criterion.id}
               criterion={criterion}
-              defaultValue={initialEvaluation?.[criterion.id]}
+              defaultValue={initialEvaluation?.[criterion.id] ?? undefined}
             />
           ))}
         </div>

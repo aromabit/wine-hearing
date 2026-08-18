@@ -147,8 +147,8 @@ function validateEvaluation(value, id) {
   }
   for (const criterion of RATING_CRITERION_IDS) {
     const score = value[criterion]
-    if (typeof score !== "number" || !Number.isFinite(score)) {
-      throw new HttpError(400, `${criterion} must be a number`)
+    if (score !== null && (typeof score !== "number" || !Number.isFinite(score))) {
+      throw new HttpError(400, `${criterion} must be a number or null`)
     }
   }
   if (value.imageIds !== undefined) {

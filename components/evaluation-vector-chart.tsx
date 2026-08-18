@@ -21,7 +21,7 @@ export const EvaluationVectorChart = ({
             {RATING_CRITERIA.filter((c) => c.group === group).map((criterion) => {
               const value = evaluation[criterion.id]
               const percent =
-                value === undefined
+                value == null
                   ? 0
                   : ((value - criterion.min) / (criterion.max - criterion.min)) * 100
               return (
@@ -29,7 +29,7 @@ export const EvaluationVectorChart = ({
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".875rem" }}>
                     <span style={{ fontWeight: 600 }}>{criterion.label}</span>
                     <span style={{ color: "var(--color-text-muted)" }}>
-                      {value === undefined ? "未入力" : value}
+                      {value == null ? "未入力" : value}
                     </span>
                   </div>
                   <div

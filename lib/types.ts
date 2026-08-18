@@ -17,27 +17,27 @@ export type WineEvaluation = {
   wineAlcoholPercent?: number
   wineMemo?: string
 
-  /** 官能評価（味覚・香り）。作成時は未記入のためundefined。 */
-  sweetness?: number
-  acidity?: number
-  bitterness?: number
-  saltiness?: number
-  tannin?: number
-  astringency?: number
-  alcohol?: number
+  /** 官能評価（味覚・香り）。作成時は未記入のためnull（API側の必須number制約に合わせ、未記入は明示的にnullを送信する）。 */
+  sweetness?: number | null
+  acidity?: number | null
+  bitterness?: number | null
+  saltiness?: number | null
+  tannin?: number | null
+  astringency?: number | null
+  alcohol?: number | null
 
-  aromaIntensity?: number
-  citrus?: number
-  stoneFruit?: number
-  tropical?: number
-  redFruit?: number
-  blackFruit?: number
-  floral?: number
-  herbal?: number
-  spice?: number
-  oak?: number
-  nutty?: number
-  earthy?: number
+  aromaIntensity?: number | null
+  citrus?: number | null
+  stoneFruit?: number | null
+  tropical?: number | null
+  redFruit?: number | null
+  blackFruit?: number | null
+  floral?: number | null
+  herbal?: number | null
+  spice?: number | null
+  oak?: number | null
+  nutty?: number | null
+  earthy?: number | null
 
   comment?: string
 
@@ -75,4 +75,4 @@ export const RATING_CRITERION_IDS = [
 
 export type RatingCriterionId = (typeof RATING_CRITERION_IDS)[number]
 
-export type EvaluationVector = Record<RatingCriterionId, number>
+export type EvaluationVector = Record<RatingCriterionId, number | null>
