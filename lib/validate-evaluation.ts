@@ -3,17 +3,20 @@ import { RatingCriterionId } from "./types"
 
 export function validateEvaluationInput(
   body: Record<string, unknown>,
-): { error: string } | { vector: Record<RatingCriterionId, number> } {
+): { error: string } | { vector: Partial<Record<RatingCriterionId, number>> } {
   if (!body.evaluatorId || typeof body.evaluatorId !== "string") {
     return { error: "evaluatorId は必須です" }
   }
 
-  const vector = {} as Record<RatingCriterionId, number>
+  const vector: Partial<Record<RatingCriterionId, number>> = {}
   for (const criterion of RATING_CRITERIA) {
     const raw = body[criterion.id]
+    // 未操作のスライダーは未送信 → 官能情報は未記入のままundefinedにする。
+    if (raw === undefined || raw === null || raw === "") continue
+
     const value = Number(raw)
-    if (raw === undefined || raw === null || raw === "" || Number.isNaN(value)) {
-      return { error: `${criterion.label} (${criterion.id}) は必須です` }
+    if (Number.isNaN(value)) {
+      return { error: `${criterion.label} (${criterion.id}) の値が不正です` }
     }
     if (value < criterion.min || value > criterion.max) {
       return {

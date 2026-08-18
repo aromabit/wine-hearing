@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import { useEvaluations } from "@/lib/evaluation-store"
+import { isSensoryComplete } from "@/lib/evaluation-status"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { computePca2D, PcaPoint, standardize } from "@/lib/pca"
 import { kMeans } from "@/lib/kmeans"
@@ -25,9 +26,11 @@ export const PcaScatterClient = () => {
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   const { points, clusters } = useMemo(() => {
-    if (evaluations.length < 2) return { points: [], clusters: [] as number[] }
-    const matrix = evaluations.map((evaluation) =>
-      RATING_CRITERIA.map((criterion) => evaluation[criterion.id]),
+    // 官能情報が未記入の評価は数値ベクトルを持たないためPCA対象から除外する。
+    const scored = evaluations.filter(isSensoryComplete)
+    if (scored.length < 2) return { points: [], clusters: [] as number[] }
+    const matrix = scored.map((evaluation) =>
+      RATING_CRITERIA.map((criterion) => evaluation[criterion.id] as number),
     )
     let raw: PcaPoint[]
     try {
@@ -37,20 +40,20 @@ export const PcaScatterClient = () => {
     }
     const clusterAssignments = kMeans(standardize(matrix), clusterCount)
     return {
-      points: raw.map((point, i) => ({ ...point, evaluation: evaluations[i] })),
+      points: raw.map((point, i) => ({ ...point, evaluation: scored[i] })),
       clusters: clusterAssignments,
     }
   }, [evaluations, clusterCount])
 
   if (!loaded) return null
 
-  if (evaluations.length < 2) {
+  if (points.length < 2) {
     return (
       <div>
         <h2 style={{ marginBottom: "1rem" }}>評価マップ（PCA）</h2>
         <p style={{ color: "var(--color-text-muted)" }}>
-          主成分分析には評価データが2件以上必要です。現在
-          {evaluations.length}件登録されています。
+          主成分分析には官能情報が記入済みの評価データが2件以上必要です。現在
+          {points.length}件です。
         </p>
       </div>
     )
@@ -71,7 +74,7 @@ export const PcaScatterClient = () => {
     HEIGHT - PADDING - ((y - yMin) / yRange) * (HEIGHT - PADDING * 2)
 
   const hovered = points.find((p) => p.evaluation.id === hoveredId)
-  const effectiveClusterCount = Math.min(clusterCount, evaluations.length)
+  const effectiveClusterCount = Math.min(clusterCount, points.length)
 
   return (
     <div>

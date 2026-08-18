@@ -20,12 +20,17 @@ export const EvaluationVectorChart = ({
           <div style={{ display: "grid", gap: ".55rem" }}>
             {RATING_CRITERIA.filter((c) => c.group === group).map((criterion) => {
               const value = evaluation[criterion.id]
-              const percent = ((value - criterion.min) / (criterion.max - criterion.min)) * 100
+              const percent =
+                value === undefined
+                  ? 0
+                  : ((value - criterion.min) / (criterion.max - criterion.min)) * 100
               return (
                 <div key={criterion.id} style={{ display: "grid", gap: ".2rem" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: ".875rem" }}>
                     <span style={{ fontWeight: 600 }}>{criterion.label}</span>
-                    <span style={{ color: "var(--color-text-muted)" }}>{value}</span>
+                    <span style={{ color: "var(--color-text-muted)" }}>
+                      {value === undefined ? "未入力" : value}
+                    </span>
                   </div>
                   <div
                     style={{

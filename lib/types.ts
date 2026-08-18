@@ -17,26 +17,27 @@ export type WineEvaluation = {
   wineAlcoholPercent?: number
   wineMemo?: string
 
-  sweetness: number
-  acidity: number
-  bitterness: number
-  saltiness: number
-  tannin: number
-  astringency: number
-  alcohol: number
+  /** 官能評価（味覚・香り）。作成時は未記入のためundefined。 */
+  sweetness?: number
+  acidity?: number
+  bitterness?: number
+  saltiness?: number
+  tannin?: number
+  astringency?: number
+  alcohol?: number
 
-  aromaIntensity: number
-  citrus: number
-  stoneFruit: number
-  tropical: number
-  redFruit: number
-  blackFruit: number
-  floral: number
-  herbal: number
-  spice: number
-  oak: number
-  nutty: number
-  earthy: number
+  aromaIntensity?: number
+  citrus?: number
+  stoneFruit?: number
+  tropical?: number
+  redFruit?: number
+  blackFruit?: number
+  floral?: number
+  herbal?: number
+  spice?: number
+  oak?: number
+  nutty?: number
+  earthy?: number
 
   comment?: string
 

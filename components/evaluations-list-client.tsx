@@ -9,6 +9,8 @@ import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
 import { useAdminMode } from "@/lib/admin-mode"
 import { useCurrentUserId } from "@/lib/current-user"
 import { useUsers } from "@/lib/user-store"
+import { isRemoteStorageEnabled } from "@/lib/evaluation-api"
+import { missingParts } from "@/lib/evaluation-status"
 
 export const EvaluationsListClient = () => {
   const { evaluations, loaded } = useEvaluations()
@@ -48,37 +50,51 @@ export const EvaluationsListClient = () => {
           {visibleEvaluations
             .slice()
             .sort((a, b) => b.evaluatedAt.localeCompare(a.evaluatedAt))
-            .map((evaluation) => (
-              <Link
-                key={evaluation.id}
-                href={`/evaluations/detail?id=${evaluation.id}`}
-              >
-                <Card
-                  style={{
-                    padding: "1rem 1.25rem",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: ".9rem",
-                  }}
+            .map((evaluation) => {
+              const missing = missingParts(evaluation, {
+                includeImage: isRemoteStorageEnabled,
+              })
+              return (
+                <Link
+                  key={evaluation.id}
+                  href={`/evaluations/detail?id=${evaluation.id}`}
                 >
-                  <BottleThumb size={40} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
-                      {evaluation.wineName || "(ワイン名未登録)"}
+                  <Card
+                    title={
+                      missing.length > 0
+                        ? `未記入: ${missing.join("・")}`
+                        : "官能・コメント・画像 記入済み"
+                    }
+                    style={{
+                      padding: "1rem 1.25rem",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".9rem",
+                      borderLeft:
+                        missing.length > 0
+                          ? "4px solid var(--color-gold)"
+                          : "4px solid var(--color-primary)",
+                    }}
+                  >
+                    <BottleThumb size={40} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
+                        {evaluation.wineName || "(ワイン名未登録)"}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: ".8rem",
+                          color: "var(--color-text-muted)",
+                        }}
+                      >
+                        {evaluation.evaluatorId} —{" "}
+                        {new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: ".8rem",
-                        color: "var(--color-text-muted)",
-                      }}
-                    >
-                      {evaluation.evaluatorId} —{" "}
-                      {new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
+                  </Card>
+                </Link>
+              )
+            })}
         </div>
       )}
     </div>

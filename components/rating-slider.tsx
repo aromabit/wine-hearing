@@ -11,7 +11,9 @@ export const RatingSlider = ({
   criterion: RatingCriterion
   defaultValue?: number
 }) => {
-  const [value, setValue] = useState(defaultValue ?? 5)
+  const [value, setValue] = useState(defaultValue ?? Math.round((criterion.min + criterion.max) / 2))
+  // 新規作成時（defaultValueなし）はスライダー未操作の間、官能値を未記入扱いにする。
+  const [touched, setTouched] = useState(defaultValue !== undefined)
 
   return (
     <Card style={{ padding: "1rem 1.1rem" }}>
@@ -22,11 +24,11 @@ export const RatingSlider = ({
         <span
           style={{
             fontWeight: 800,
-            color: "var(--color-primary)",
+            color: touched ? "var(--color-primary)" : "var(--color-text-muted)",
             fontSize: "1.1rem",
           }}
         >
-          {value}
+          {touched ? value : "未入力"}
         </span>
       </div>
       <p
@@ -40,13 +42,16 @@ export const RatingSlider = ({
       </p>
       <input
         id={criterion.id}
-        name={criterion.id}
+        name={touched ? criterion.id : undefined}
         type="range"
         min={criterion.min}
         max={criterion.max}
         step={criterion.step}
         value={value}
-        onChange={(e) => setValue(Number(e.target.value))}
+        onChange={(e) => {
+          setValue(Number(e.target.value))
+          setTouched(true)
+        }}
       />
       <div
         style={{
