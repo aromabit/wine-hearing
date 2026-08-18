@@ -1,6 +1,11 @@
 import { FC } from "react"
+import { EvaluationImage } from "@/components/evaluation-image"
 
-export const BottleThumb: FC<{ size?: number }> = ({ size = 56 }) => (
+export const BottleThumb: FC<{
+  size?: number
+  evaluationId?: string
+  imageId?: string
+}> = ({ size = 56, evaluationId, imageId }) => (
   <div
     style={{
       width: size,
@@ -15,8 +20,17 @@ export const BottleThumb: FC<{ size?: number }> = ({ size = 56 }) => (
       justifyContent: "center",
       fontSize: size * 0.5,
       flexShrink: 0,
+      overflow: "hidden",
     }}
   >
-    🍷
+    {evaluationId && imageId ? (
+      <EvaluationImage
+        evaluationId={evaluationId}
+        imageId={imageId}
+        style={{ width: size, height: size, borderRadius: "50%" }}
+      />
+    ) : (
+      "🍷"
+    )}
   </div>
 )

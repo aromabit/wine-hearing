@@ -66,17 +66,31 @@ export const EvaluationsListClient = () => {
                         : "官能・コメント・画像 記入済み"
                     }
                     style={{
-                      padding: "1rem 1.25rem",
+                      padding: ".5rem",
                       display: "flex",
                       alignItems: "center",
                       gap: ".9rem",
                       borderLeft:
                         missing.length > 0
-                          ? "4px solid var(--color-gold)"
-                          : "4px solid var(--color-primary)",
+                          ? "8px solid var(--color-gold)"
+                          : "8px solid var(--color-primary)",
+                      background:
+                        missing.length > 0
+                          ? "color-mix(in srgb, var(--color-gold) 8%, var(--color-surface))"
+                          : "color-mix(in srgb, var(--color-primary) 6%, var(--color-surface))",
                     }}
                   >
-                    <BottleThumb size={40} />
+                    <BottleThumb
+                      size={64}
+                      evaluationId={
+                        isRemoteStorageEnabled ? evaluation.id : undefined
+                      }
+                      imageId={
+                        isRemoteStorageEnabled
+                          ? evaluation.imageIds?.[0]
+                          : undefined
+                      }
+                    />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
                         {evaluation.wineName || "(ワイン名未登録)"}
