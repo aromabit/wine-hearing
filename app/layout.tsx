@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Header } from "@/components/header"
 import { SeedLocalEvaluations } from "@/components/seed-local-evaluations"
 import { CurrentUserGate } from "@/components/current-user-gate"
@@ -33,9 +34,20 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 color: "var(--color-text-muted)",
                 fontSize: ".75rem",
                 padding: "1rem 1.5rem",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "1rem",
+                flexWrap: "wrap",
               }}
             >
               <p>&copy; ScentifAI</p>
+              <Link
+                href="/help"
+                style={{ color: "var(--color-text-muted)" }}
+              >
+                使い方
+              </Link>
             </footer>
           </CurrentUserGate>
         </AdminModeProvider>
