@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, FormEvent, useState } from "react"
+import { ChangeEvent, FormEvent, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { RATING_CRITERIA } from "@/lib/rating-criteria"
 import { RatingSlider } from "@/components/rating-slider"
@@ -42,8 +42,11 @@ export const EvaluationForm = ({
   initialEvaluation?: WineEvaluation
 }) => {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
+  const isEditing = Boolean(initialEvaluation)
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
+  const [savedEvaluationId, setSavedEvaluationId] = useState<string>()
   const [showWineDetails, setShowWineDetails] = useState(false)
   const [existingImageIds, setExistingImageIds] = useState<string[]>(
     initialEvaluation?.imageIds ?? [],
@@ -167,11 +170,50 @@ export const EvaluationForm = ({
       return
     }
 
-    router.push(`/evaluations/detail?id=${evaluation.id}`)
+    setPending(false)
+    setSavedEvaluationId(evaluation.id)
+  }
+
+  const handleCreateNext = () => {
+    if (isEditing) {
+      router.push("/evaluations/new")
+      return
+    }
+    // 新規作成モードは同一ページに留まりフォームを空に戻す。
+    formRef.current?.reset()
+    setExistingImageIds([])
+    setRemovedImageIds([])
+    setNewImages([])
+    setError(undefined)
+    setSavedEvaluationId(undefined)
+  }
+
+  if (savedEvaluationId) {
+    return (
+      <Card style={{ padding: "1.25rem", maxWidth: 640, display: "grid", gap: "1rem" }}>
+        <p>評価を保存しました。</p>
+        <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
+          <Button type="button" onClick={handleCreateNext}>
+            次を作成
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push(`/evaluations/detail?id=${savedEvaluationId}`)}
+          >
+            評価詳細を見る
+          </Button>
+          <Button type="button" variant="outline" onClick={() => router.push("/")}>
+            一覧に戻る
+          </Button>
+        </div>
+      </Card>
+    )
   }
 
   return (
     <form
+      ref={formRef}
       onSubmit={(e) => void handleSubmit(e)}
       style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
     >
