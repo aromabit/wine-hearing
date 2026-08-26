@@ -218,7 +218,7 @@ export const EvaluationForm = ({
     <form
       ref={formRef}
       onSubmit={(e) => void handleSubmit(e)}
-      style={{ display: "grid", gap: "1.75rem", maxWidth: 640 }}
+      style={{ display: "grid", gap: "1.75rem", maxWidth: 640, paddingBottom: "5rem" }}
     >
       {!showWineDetails && (
         <Button
@@ -493,9 +493,26 @@ export const EvaluationForm = ({
         <p style={{ color: "#b3261e", fontSize: ".875rem" }}>{error}</p>
       )}
 
-      <Button type="submit" disabled={pending} style={{ width: "fit-content" }}>
-        {pending ? "保存中..." : "評価を保存"}
-      </Button>
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "var(--color-surface)",
+          borderTop: "1px solid var(--color-border)",
+          padding: "1rem 1.5rem",
+          display: "flex",
+          justifyContent: "center",
+          zIndex: 100,
+        }}
+      >
+        <div style={{ width: "100%", maxWidth: 960 }}>
+          <Button type="submit" disabled={pending} style={{ width: "fit-content" }}>
+            {pending ? "保存中..." : "評価を保存"}
+          </Button>
+        </div>
+      </div>
     </form>
     </>
   )
