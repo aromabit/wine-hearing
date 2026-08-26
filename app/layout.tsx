@@ -64,12 +64,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
               <p>&copy; ScentifAI</p>
               <div style={{ display: "flex", gap: "1rem" }}>
                 <Link
-                  href="/settings"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  設定
-                </Link>
-                <Link
                   href="/help"
                   style={{ color: "var(--color-text-muted)" }}
                 >

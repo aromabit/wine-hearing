@@ -1,4 +1,5 @@
 import { Card } from "@/components/elements/card"
+import { InstallPwaSection } from "@/components/install-pwa-section"
 
 const sectionStyle = { display: "grid", gap: ".9rem" }
 const headingStyle = {
@@ -67,6 +68,14 @@ const HelpPage = () => {
         <p style={mutedStyle}>
           管理者モードのアカウントにはヘッダーに「ユーザー管理」が表示され、評価者アカウントの追加・編集ができる。
         </p>
+      </Card>
+
+      <Card style={cardStyle}>
+        <h2 style={headingStyle}>5. ホーム画面に追加</h2>
+        <p style={mutedStyle}>
+          Wine Hearing をホーム画面に追加するとアプリのように起動できる。
+        </p>
+        <InstallPwaSection />
       </Card>
     </div>
   )
