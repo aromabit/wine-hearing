@@ -43,7 +43,6 @@ export const EvaluationForm = ({
 }) => {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
-  const isEditing = Boolean(initialEvaluation)
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
   const [savedEvaluationId, setSavedEvaluationId] = useState<string>()
@@ -175,43 +174,47 @@ export const EvaluationForm = ({
   }
 
   const handleCreateNext = () => {
-    if (isEditing) {
-      router.push("/evaluations/new")
-      return
-    }
-    // 新規作成モードは同一ページに留まりフォームを空に戻す。
-    formRef.current?.reset()
-    setExistingImageIds([])
-    setRemovedImageIds([])
-    setNewImages([])
-    setError(undefined)
+    router.push("/evaluations/new")
     setSavedEvaluationId(undefined)
   }
 
-  if (savedEvaluationId) {
-    return (
-      <Card style={{ padding: "1.25rem", maxWidth: 640, display: "grid", gap: "1rem" }}>
-        <p>評価を保存しました。</p>
-        <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
-          <Button type="button" onClick={handleCreateNext}>
-            次を作成
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push(`/evaluations/detail?id=${savedEvaluationId}`)}
-          >
-            評価詳細を見る
-          </Button>
-          <Button type="button" variant="outline" onClick={() => router.push("/")}>
-            一覧に戻る
-          </Button>
-        </div>
-      </Card>
-    )
-  }
-
   return (
+    <>
+    {savedEvaluationId && (
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "1rem",
+          zIndex: 1000,
+        }}
+      >
+        <Card style={{ padding: "1.25rem", maxWidth: 480, width: "100%", display: "grid", gap: "1rem" }}>
+          <p>評価を保存しました。</p>
+          <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
+            <Button type="button" onClick={handleCreateNext}>
+              次を作成
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push(`/evaluations/detail?id=${savedEvaluationId}`)}
+            >
+              評価詳細を見る
+            </Button>
+            <Button type="button" variant="outline" onClick={() => router.push("/")}>
+              一覧に戻る
+            </Button>
+          </div>
+        </Card>
+      </div>
+    )}
     <form
       ref={formRef}
       onSubmit={(e) => void handleSubmit(e)}
@@ -494,5 +497,6 @@ export const EvaluationForm = ({
         {pending ? "保存中..." : "評価を保存"}
       </Button>
     </form>
+    </>
   )
 }
