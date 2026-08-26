@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { deleteEvaluation, useEvaluation } from "@/lib/evaluation-store"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
@@ -15,6 +16,7 @@ export const EvaluationDetailClient = () => {
   const id = searchParams.get("id")
   const { evaluation, loaded } = useEvaluation(id)
   const { isAdmin } = useAdminMode()
+  const [expandedImageId, setExpandedImageId] = useState<string>()
 
   if (!loaded) return null
 
@@ -128,20 +130,64 @@ export const EvaluationDetailClient = () => {
           <h3 style={{ marginBottom: ".75rem" }}>写真</h3>
           <div style={{ display: "flex", gap: ".6rem", flexWrap: "wrap" }}>
             {evaluation.imageIds.map((imageId) => (
-              <EvaluationImage
+              <button
                 key={imageId}
-                evaluationId={evaluation.id}
-                imageId={imageId}
+                type="button"
+                onClick={() => setExpandedImageId(imageId)}
+                aria-label="写真を拡大表示"
                 style={{
-                  width: 120,
-                  height: 120,
-                  borderRadius: 8,
-                  border: "1px solid var(--color-border)",
+                  padding: 0,
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer",
                 }}
-              />
+              >
+                <EvaluationImage
+                  evaluationId={evaluation.id}
+                  imageId={imageId}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    borderRadius: 8,
+                    border: "1px solid var(--color-border)",
+                  }}
+                />
+              </button>
             ))}
           </div>
         </Card>
+      )}
+
+      {expandedImageId && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setExpandedImageId(undefined)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
+            zIndex: 1000,
+            cursor: "zoom-out",
+          }}
+        >
+          <EvaluationImage
+            evaluationId={evaluation.id}
+            imageId={expandedImageId}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              width: "auto",
+              height: "auto",
+              objectFit: "contain",
+              borderRadius: 8,
+            }}
+          />
+        </div>
       )}
 
       <EvaluationVectorChart evaluation={evaluation} />

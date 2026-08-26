@@ -1,8 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { useEvaluations } from "@/lib/evaluation-store"
 import { Card } from "@/components/elements/card"
+import { EvaluationImage } from "@/components/evaluation-image"
 import { BottleThumb } from "@/components/elements/bottle-thumb"
 import { LinkButton } from "@/components/elements/button"
 import { ExportEvaluationsButton } from "@/components/export-evaluations-button"
@@ -18,6 +20,10 @@ export const EvaluationsListClient = () => {
   const { users } = useUsers()
   const currentUserId = useCurrentUserId()
   const currentUserName = users.find((u) => u.id === currentUserId)?.name
+  const [expandedImage, setExpandedImage] = useState<{
+    evaluationId: string
+    imageId: string
+  }>()
 
   // 管理者以外は自分が評価者の項目のみ表示する。
   const visibleEvaluations = isAdmin
@@ -82,17 +88,44 @@ export const EvaluationsListClient = () => {
                       background: `color-mix(in srgb, ${progressColor} 8%, var(--color-surface))`,
                     }}
                   >
-                    <BottleThumb
-                      size={64}
-                      evaluationId={
-                        isRemoteStorageEnabled ? evaluation.id : undefined
-                      }
-                      imageId={
-                        isRemoteStorageEnabled
-                          ? evaluation.imageIds?.[0]
-                          : undefined
-                      }
-                    />
+                    {(() => {
+                      const thumbImageId = isRemoteStorageEnabled
+                        ? evaluation.imageIds?.[0]
+                        : undefined
+                      const thumb = (
+                        <BottleThumb
+                          size={64}
+                          evaluationId={
+                            isRemoteStorageEnabled ? evaluation.id : undefined
+                          }
+                          imageId={thumbImageId}
+                        />
+                      )
+                      if (!thumbImageId) return thumb
+                      return (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setExpandedImage({
+                              evaluationId: evaluation.id,
+                              imageId: thumbImageId,
+                            })
+                          }}
+                          aria-label="写真を拡大表示"
+                          style={{
+                            padding: 0,
+                            border: "none",
+                            background: "none",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {thumb}
+                        </button>
+                      )
+                    })()}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
                         {evaluation.wineName || "(ワイン名未登録)"}
@@ -111,6 +144,38 @@ export const EvaluationsListClient = () => {
                 </Link>
               )
             })}
+        </div>
+      )}
+
+      {expandedImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setExpandedImage(undefined)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1rem",
+            zIndex: 1000,
+            cursor: "zoom-out",
+          }}
+        >
+          <EvaluationImage
+            evaluationId={expandedImage.evaluationId}
+            imageId={expandedImage.imageId}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              width: "auto",
+              height: "auto",
+              objectFit: "contain",
+              borderRadius: 8,
+            }}
+          />
         </div>
       )}
     </div>
