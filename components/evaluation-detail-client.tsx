@@ -2,20 +2,17 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { deleteEvaluation, useEvaluation } from "@/lib/evaluation-store"
+import { useSearchParams } from "next/navigation"
+import { useEvaluation } from "@/lib/evaluation-store"
 import { EvaluationVectorChart } from "@/components/evaluation-vector-chart"
 import { EvaluationImage } from "@/components/evaluation-image"
 import { Card, Tag } from "@/components/elements/card"
-import { Button, LinkButton } from "@/components/elements/button"
-import { useAdminMode } from "@/lib/admin-mode"
+import { LinkButton } from "@/components/elements/button"
 
 export const EvaluationDetailClient = () => {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const id = searchParams.get("id")
   const { evaluation, loaded } = useEvaluation(id)
-  const { isAdmin } = useAdminMode()
   const [expandedImageId, setExpandedImageId] = useState<string>()
 
   if (!loaded) return null
@@ -29,18 +26,6 @@ export const EvaluationDetailClient = () => {
         </p>
       </div>
     )
-  }
-
-  const handleDelete = async () => {
-    if (!confirm("この評価を削除しますか？")) return
-    try {
-      await deleteEvaluation(evaluation.id)
-    } catch (error) {
-      console.error("failed to delete the evaluation", error)
-      alert("削除に失敗しました。通信環境を確認してもう一度お試しください。")
-      return
-    }
-    router.push("/")
   }
 
   return (
@@ -64,15 +49,6 @@ export const EvaluationDetailClient = () => {
             >
               編集
             </LinkButton>
-            {isAdmin && (
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => void handleDelete()}
-              >
-                削除
-              </Button>
-            )}
           </div>
         </div>
 

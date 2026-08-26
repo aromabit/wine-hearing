@@ -10,7 +10,7 @@ import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
 import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
-import { saveEvaluation } from "@/lib/evaluation-store"
+import { deleteEvaluation, saveEvaluation } from "@/lib/evaluation-store"
 import {
   deleteRemoteEvaluationImage,
   isRemoteStorageEnabled,
@@ -176,6 +176,19 @@ export const EvaluationForm = ({
   const handleCreateNext = () => {
     router.push("/evaluations/new")
     setSavedEvaluationId(undefined)
+  }
+
+  const handleDelete = async () => {
+    if (!initialEvaluation) return
+    if (!confirm("この評価を削除しますか？")) return
+    try {
+      await deleteEvaluation(initialEvaluation.id)
+    } catch (error) {
+      console.error("failed to delete the evaluation", error)
+      alert("削除に失敗しました。通信環境を確認してもう一度お試しください。")
+      return
+    }
+    router.push("/")
   }
 
   return (
@@ -507,10 +520,20 @@ export const EvaluationForm = ({
           zIndex: 100,
         }}
       >
-        <div style={{ width: "100%", maxWidth: 960 }}>
+        <div style={{ width: "100%", maxWidth: 960, display: "flex", gap: ".5rem" }}>
           <Button type="submit" disabled={pending} style={{ width: "fit-content" }}>
             {pending ? "保存中..." : "評価を保存"}
           </Button>
+          {initialEvaluation && (
+            <Button
+              type="button"
+              variant="danger"
+              onClick={() => void handleDelete()}
+              style={{ width: "fit-content" }}
+            >
+              削除
+            </Button>
+          )}
         </div>
       </div>
     </form>
