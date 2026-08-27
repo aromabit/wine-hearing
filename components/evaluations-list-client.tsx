@@ -127,8 +127,19 @@ export const EvaluationsListClient = () => {
                       )
                     })()}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, color: "var(--color-text)" }}>
-                        {evaluation.wineName || "(ワイン名未登録)"}
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          color: "var(--color-text)",
+                          display: "flex",
+                          alignItems: "baseline",
+                          gap: ".4rem",
+                        }}
+                      >
+                        <span style={{ color: "var(--color-primary)" }}>
+                          #{evaluation.number}
+                        </span>
+                        <span>{evaluation.wineName || "(ワイン名未登録)"}</span>
                       </div>
                       <div
                         style={{
@@ -136,7 +147,7 @@ export const EvaluationsListClient = () => {
                           color: "var(--color-text-muted)",
                         }}
                       >
-                        {evaluation.evaluatorId} #{evaluation.number} —{" "}
+                        {evaluation.evaluatorId} —{" "}
                         {new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}
                       </div>
                     </div>
