@@ -10,7 +10,11 @@ import { Button } from "@/components/elements/button"
 import { Card } from "@/components/elements/card"
 import { SpeechTextarea } from "@/components/elements/speech-textarea"
 import { validateEvaluationInput } from "@/lib/validate-evaluation"
-import { deleteEvaluation, saveEvaluation } from "@/lib/evaluation-store"
+import {
+  deleteEvaluation,
+  saveEvaluation,
+  useEvaluations,
+} from "@/lib/evaluation-store"
 import {
   deleteRemoteEvaluationImage,
   isRemoteStorageEnabled,
@@ -89,6 +93,7 @@ export const EvaluationForm = ({
   const currentUserName = users.find((u) => u.id === currentUserId)?.name
   // 編集時は元の評価者を維持、新規作成時は現在選択中のユーザーで固定する。
   const evaluatorId = initialEvaluation?.evaluatorId ?? currentUserName ?? ""
+  const { evaluations } = useEvaluations()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -126,8 +131,22 @@ export const EvaluationForm = ({
     const vintageRaw = formData.get("vintage")
     const wineAlcoholPercentRaw = formData.get("wineAlcoholPercent")
 
+    const nextEvaluatorId = body.evaluatorId as string
+    const evaluatorEvaluations = evaluations.filter(
+      (item) => item.evaluatorId === nextEvaluatorId
+    )
+    const maxNumber = evaluatorEvaluations.reduce(
+      (max, item) => (Number.isFinite(item.number) ? Math.max(max, item.number) : max),
+      0
+    )
+    // 欠番があっても件数以下には振らない（最大値+1 と 件数+1 の大きい方）。
+    const nextNumber =
+      initialEvaluation?.number ??
+      Math.max(maxNumber + 1, evaluatorEvaluations.length + 1)
+
     const evaluation: WineEvaluation = {
       id: initialEvaluation?.id ?? crypto.randomUUID(),
+      number: nextNumber,
       wineName: body.wineName as string,
       producer: (formData.get("producer") as string) || undefined,
       grapeVarieties,

@@ -95,7 +95,9 @@ export const EvaluationDetailClient = () => {
           }}
         >
           <dt style={{ color: "var(--color-text-muted)" }}>評価者</dt>
-          <dd>{evaluation.evaluatorId}</dd>
+          <dd>
+            {evaluation.evaluatorId} #{evaluation.number}
+          </dd>
           <dt style={{ color: "var(--color-text-muted)" }}>評価日時</dt>
           <dd>{new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}</dd>
         </dl>

@@ -129,14 +129,6 @@ export async function deleteEvaluation(id: string): Promise<void> {
   await commit(next, () => deleteRemoteEvaluation(id))
 }
 
-/** Seeds sample data into the local cache only, never into the shared bucket. */
-export function seedLocalEvaluationsIfEmpty(seed: WineEvaluation[]): void {
-  if (isRemoteStorageEnabled) return
-  if (window.localStorage.getItem(STORAGE_KEY) !== null) return
-  writeCache(seed)
-  setSnapshot(seed, true)
-}
-
 export function useEvaluations(): Snapshot {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }

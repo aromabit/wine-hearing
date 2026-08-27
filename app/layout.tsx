@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Header } from "@/components/header"
-import { SeedLocalEvaluations } from "@/components/seed-local-evaluations"
 import { CurrentUserGate } from "@/components/current-user-gate"
 import { RegisterServiceWorker } from "@/components/register-service-worker"
 import { AdminModeProvider } from "@/lib/admin-mode"
@@ -35,7 +34,6 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body>
         <AdminModeProvider>
           <RegisterServiceWorker />
-          <SeedLocalEvaluations />
           <CurrentUserGate>
             <Header />
             <main

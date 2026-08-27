@@ -5,6 +5,8 @@ export type User = {
 
 export type WineEvaluation = {
   id: string
+  /** 評価者ごとの通し番号。作成時に採番され、以後変更されない。 */
+  number: number
   evaluatorId: string
   evaluatedAt: string
 

@@ -136,7 +136,7 @@ export const EvaluationsListClient = () => {
                           color: "var(--color-text-muted)",
                         }}
                       >
-                        {evaluation.evaluatorId} —{" "}
+                        {evaluation.evaluatorId} #{evaluation.number} —{" "}
                         {new Date(evaluation.evaluatedAt).toLocaleString("ja-JP")}
                       </div>
                     </div>
