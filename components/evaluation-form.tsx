@@ -26,6 +26,17 @@ import { useCurrentUserId } from "@/lib/current-user"
 
 type NewImage = { id: string; file: File; previewUrl: string }
 
+/** Turns a caught error into a short, user-facing description of its type. */
+function describeError(error: unknown): string {
+  if (error instanceof TypeError) {
+    return "ネットワークエラー"
+  }
+  if (error instanceof Error) {
+    return error.message
+  }
+  return "不明なエラー"
+}
+
 const removeImageButtonStyle = {
   position: "absolute" as const,
   top: -6,
@@ -183,7 +194,9 @@ export const EvaluationForm = ({
       await saveEvaluation(evaluation)
     } catch (saveError) {
       console.error("failed to save the evaluation", saveError)
-      setError("保存に失敗しました。通信環境を確認してもう一度お試しください。")
+      setError(
+        `保存に失敗しました（${describeError(saveError)}）。通信環境を確認してもう一度お試しください。`
+      )
       setPending(false)
       return
     }
@@ -204,7 +217,9 @@ export const EvaluationForm = ({
       await deleteEvaluation(initialEvaluation.id)
     } catch (error) {
       console.error("failed to delete the evaluation", error)
-      alert("削除に失敗しました。通信環境を確認してもう一度お試しください。")
+      alert(
+        `削除に失敗しました（${describeError(error)}）。通信環境を確認してもう一度お試しください。`
+      )
       return
     }
     router.push("/")
