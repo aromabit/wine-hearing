@@ -46,10 +46,10 @@ export const SpeechTextarea = ({
   placeholder?: string
   style?: CSSProperties
 }) => {
-  const [value, setValue] = useState(defaultValue ?? "")
   const [listening, setListening] = useState(false)
   const [supported] = useState(() => !!getSpeechRecognitionConstructor())
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
   const baseValueRef = useRef("")
 
   useEffect(() => {
@@ -71,14 +71,18 @@ export const SpeechTextarea = ({
     recognition.lang = "ja-JP"
     recognition.continuous = true
     recognition.interimResults = true
-    baseValueRef.current = value ? `${value} ` : ""
+    const current = textareaRef.current?.value ?? ""
+    baseValueRef.current = current ? `${current} ` : ""
 
     recognition.onresult = (event) => {
       let transcript = ""
       for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript
       }
-      setValue(baseValueRef.current + transcript)
+      // 非制御入力: DOMへ直接書き込む（controlledだとiOS標準音声入力のonChange未発火でstate巻き戻りが起きる）。
+      if (textareaRef.current) {
+        textareaRef.current.value = baseValueRef.current + transcript
+      }
     }
     recognition.onend = () => setListening(false)
     recognition.onerror = () => setListening(false)
@@ -91,10 +95,10 @@ export const SpeechTextarea = ({
   return (
     <div style={{ position: "relative" }}>
       <textarea
+        ref={textareaRef}
         id={id}
         name={name}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
+        defaultValue={defaultValue}
         placeholder={placeholder}
         style={{ ...inputStyle, ...style, paddingRight: supported ? "2.75rem" : style?.paddingRight }}
       />
