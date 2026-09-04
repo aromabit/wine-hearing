@@ -206,8 +206,14 @@ export const EvaluationForm = ({
   }
 
   const handleCreateNext = () => {
-    router.push("/evaluations/new")
+    formRef.current?.reset()
+    newImages.forEach((img) => URL.revokeObjectURL(img.previewUrl))
+    setExistingImageIds([])
+    setRemovedImageIds([])
+    setNewImages([])
+    setShowWineDetails(false)
     setSavedEvaluationId(undefined)
+    router.push("/evaluations/new")
   }
 
   const handleDelete = async () => {
