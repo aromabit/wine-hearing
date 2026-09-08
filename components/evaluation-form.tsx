@@ -511,9 +511,9 @@ export const EvaluationForm = ({
       )}
 
       <div>
-        <h3 style={{ marginBottom: ".75rem" }}>味覚・構造</h3>
+        <h3 style={{ marginBottom: ".75rem" }}>香り</h3>
         <div style={{ display: "grid", gap: ".6rem" }}>
-          {tasteCriteria.map((criterion) => (
+          {aromaCriteria.map((criterion) => (
             <RatingSlider
               key={criterion.id}
               criterion={criterion}
@@ -524,9 +524,9 @@ export const EvaluationForm = ({
       </div>
 
       <div>
-        <h3 style={{ marginBottom: ".75rem" }}>香り</h3>
+        <h3 style={{ marginBottom: ".75rem" }}>味覚・構造</h3>
         <div style={{ display: "grid", gap: ".6rem" }}>
-          {aromaCriteria.map((criterion) => (
+          {tasteCriteria.map((criterion) => (
             <RatingSlider
               key={criterion.id}
               criterion={criterion}

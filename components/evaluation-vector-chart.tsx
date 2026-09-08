@@ -8,8 +8,8 @@ export const EvaluationVectorChart = ({
   evaluation: WineEvaluation
 }) => {
   const groups = [
-    { title: "味覚・構造", group: "taste" as const },
     { title: "香り", group: "aroma" as const },
+    { title: "味覚・構造", group: "taste" as const },
   ]
 
   return (
