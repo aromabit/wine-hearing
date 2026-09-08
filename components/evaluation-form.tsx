@@ -23,6 +23,7 @@ import {
 import { EvaluationImage } from "@/components/evaluation-image"
 import { useUsers } from "@/lib/user-store"
 import { useCurrentUserId } from "@/lib/current-user"
+import { useAdminMode } from "@/lib/admin-mode"
 
 type NewImage = { id: string; file: File; previewUrl: string }
 
@@ -105,6 +106,7 @@ export const EvaluationForm = ({
   // 編集時は元の評価者を維持、新規作成時は現在選択中のユーザーで固定する。
   const evaluatorId = initialEvaluation?.evaluatorId ?? currentUserName ?? ""
   const { evaluations } = useEvaluations()
+  const { isAdmin } = useAdminMode()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -151,9 +153,16 @@ export const EvaluationForm = ({
       0
     )
     // 欠番があっても件数以下には振らない（最大値+1 と 件数+1 の大きい方）。
-    const nextNumber =
+    const autoNumber =
       initialEvaluation?.number ??
       Math.max(maxNumber + 1, evaluatorEvaluations.length + 1)
+    // 管理者モードのみ番号の手動変更を許可する。
+    const numberOverrideRaw = isAdmin ? formData.get("number") : null
+    const numberOverride =
+      typeof numberOverrideRaw === "string" && numberOverrideRaw.trim() !== ""
+        ? Number(numberOverrideRaw)
+        : undefined
+    const nextNumber = numberOverride ?? autoNumber
 
     const evaluation: WineEvaluation = {
       id: initialEvaluation?.id ?? crypto.randomUUID(),
@@ -273,6 +282,22 @@ export const EvaluationForm = ({
       onSubmit={(e) => void handleSubmit(e)}
       style={{ display: "grid", gap: "1.75rem", maxWidth: 640, paddingBottom: "5rem" }}
     >
+      {isAdmin && (
+        <div style={{ ...fieldStyle, maxWidth: 160 }}>
+          <label htmlFor="number" style={labelStyle}>
+            番号（管理者編集）
+          </label>
+          <input
+            id="number"
+            name="number"
+            type="number"
+            min={1}
+            defaultValue={initialEvaluation?.number}
+            style={inputStyle}
+          />
+        </div>
+      )}
+
       {!showWineDetails && (
         <Button
           type="button"
