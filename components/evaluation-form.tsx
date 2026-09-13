@@ -62,7 +62,19 @@ export const EvaluationForm = ({
   const [error, setError] = useState<string>()
   const [pending, setPending] = useState(false)
   const [savedEvaluationId, setSavedEvaluationId] = useState<string>()
-  const [showWineDetails, setShowWineDetails] = useState(false)
+  // 既存の詳細情報を持つ評価を編集する際、パネルが閉じたまま保存すると
+  // 該当inputがFormDataに含まれず値が消えるため、初期状態で開いておく。
+  const hasWineDetails = Boolean(
+    initialEvaluation &&
+      (initialEvaluation.producer ||
+        initialEvaluation.grapeVarieties?.length ||
+        initialEvaluation.country ||
+        initialEvaluation.region ||
+        initialEvaluation.vintage ||
+        initialEvaluation.wineAlcoholPercent ||
+        initialEvaluation.wineMemo)
+  )
+  const [showWineDetails, setShowWineDetails] = useState(hasWineDetails)
   const [existingImageIds, setExistingImageIds] = useState<string[]>(
     initialEvaluation?.imageIds ?? [],
   )
